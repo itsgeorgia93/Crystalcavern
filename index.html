@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 2.8</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 2.9</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
 #creator{position:fixed;inset:0;z-index:30;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;background:linear-gradient(#141b3b,#2d2851);color:#fff;padding:24px 18px calc(180px + env(safe-area-inset-bottom,0px));text-align:center;font-family:system-ui}
 #creator h1{margin:0 0 4px;font-size:25px}#creator p{margin:4px 0 12px;color:#d9d0f3;font-size:13px}
 #preview{width:210px;height:195px;display:block;margin:auto;background:#222c50;border-radius:20px}
@@ -99,6 +99,13 @@ const bagColors=[['#e64d55'],['#f59e3d'],['#f4d35e'],['#4cbf8b'],['#438de5'],['#
 let creatorOpen=true,started=false;
 let discoveryQueue=[],activeDiscovery=null,seenFirstPotion=false,seenCompanionTypes=new Set(),walkCycle=0;
 let xpTotal=0,xpLevel=1,xpInLevel=0,xpNeed=100,xpBubbles=[];
+let blastSequence=0,pendingBlast=null;
+function finishBlastIfCollected(){
+ if(!pendingBlast||pendingBlast.remaining>0)return;
+ const result=pendingBlast;pendingBlast=null;
+ if(result.collected>0)queueRecord('potion',result.collected);
+}
+
 let records={potion:0,dragon:0,fairy:0,tome:0};
 let recordQueue=[],recordOpen=false,companionGems=0,companionTypeForRecord=null;
 function recordKey(){return 'crystalCavernRecordsV27:'+encodeURIComponent(custom.name||'Goblin')}
@@ -147,13 +154,13 @@ function zoomScale(){return Math.max(.65,1-Math.max(0,cave-2)*.018)}
 function worldToScreen(x,y){const z=zoomScale();return {x:player.x+(x-player.x)*z,y:player.y+(y-player.y)*z}}
 function speedBonus(){let b=0;for(let i=1;i<speedLevel;i++)b+=i<=5?.04:i<=10?.03:.02;return Math.min(.65,b)}
 
-function caveDensity(){return Math.min(5.1,1.35+(cave-1)*.36)}
+function caveDensity(){return Math.min(6.4,2.35+(cave-1)*.36)}
 function spawn(){
  nodes=[];nodeSerial=0;spawnFront=player.y-40;
  fillAhead();
 }
 function fillAhead(){
- const gap=Math.max(15,28/caveDensity());
+ const gap=Math.max(11,28/caveDensity());
  const ahead=player.y-(H*.95)/zoomScale();
  while(spawnFront>ahead){
    const y=spawnFront;
@@ -171,6 +178,19 @@ function fillAhead(){
        n.hp=n.tier===3?9:n.tier===2?5:2;n.maxHp=n.hp;
        n.color=n.tier===3?'#ffb85c':n.tier===2?'#d7a1ff':'#79f4e9'}
      nodes.push(n);
+   }
+   // An extra middle ring of gems and rocks fills the visible cave,
+   // without granting a larger starting mining radius.
+   for(const side of [-1,1]){
+     const extra=makeNode(y+rand(-gap*.45,gap*.45),nodeSerial++);
+     extra.x=W/2+side*rand(Math.min(44,W*.12),Math.max(55,Math.min(95,W*.24)));
+     extra.rock=Math.random()<.42;
+     extra.tier=extra.rock?0:Math.random()<.13?3:Math.random()<.32?2:1;
+     extra.r=extra.rock?rand(11,18):extra.tier===3?22:extra.tier===2?18:14;
+     extra.hp=extra.rock?2:extra.tier===3?9:extra.tier===2?5:2;
+     extra.maxHp=extra.hp;
+     extra.color=extra.rock?'#a2a3b2':extra.tier===3?'#ffb85c':extra.tier===2?'#d7a1ff':'#79f4e9';
+     nodes.push(extra);
    }
    // Large mystery boulders sit in the wider reaches of the cave.
    // Some reveal a tiny crystal tip; their purpose is visual anticipation
@@ -404,7 +424,7 @@ function drawCompanion(t){
  ctx.fillStyle='#92f3bc';ctx.fillRect(x-21,y+16,42*companionRemaining/10000,5);
 }
 // Gentle synthesized effects: no external audio files, no autoplay.
-let audioCtx=null,soundOn=true,lastTink=0,lastPlink=0,lastCrumble=0,companionMusicClock=0;
+let audioCtx=null,soundOn=true,lastTink=0,lastPlink=0,lastCrumble=0,lastCrystalChime=0,companionMusicClock=0;
 function wakeAudio(){if(!soundOn)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){audioCtx=null}}
 function tone(freq=620,duration=.09,volume=.028,type='sine',slide=1){
  if(!soundOn||!audioCtx||audioCtx.state!=='running')return;
@@ -416,30 +436,38 @@ function sfx(kind,tier=1){const t=performance.now();if(kind==='hit'){if(t-lastTi
  else if(kind==='potionFound'){tone(540,.12,.022,'sine',1.4);tone(810,.24,.026,'sine',1.32);tone(1080,.35,.013,'triangle',1.1)}
  else if(kind==='collect'){if(t-lastPlink<72)return;lastPlink=t;tone(740+rand(0,220),.115,.026,'sine',1.35)}
  else if(kind==='crystalTinkle'){
-   // Separate from the existing collection plink. Higher tiers sound more enchanted.
-   
-   const base=tier>=3?1046:tier===2?880:740;
-   tone(base+rand(-25,25),.17,.018,'sine',1.27);
-   if(tier>=2)tone(base*1.5,.25,.012,'sine',1.15);
-   if(tier>=3)tone(base*2,.35,.009,'triangle',1.1);
+   // Original crystalline bell timbre: sparkling, glassy partials,
+   // with richer harmonics for rarer gems.
+   if(t-lastCrystalChime<45)return;lastCrystalChime=t;
+   const root=(tier>=3?1047:tier===2?880:698)*rand(.985,1.015);
+   tone(root,.32,.025,'sine',1.03);
+   tone(root*2.01,.20,.011,'sine',.98);
+   if(tier>=2){
+     tone(root*1.502,.39,.012,'sine',1.015);
+     tone(root*2.98,.26,.007,'triangle',.96);
+   }
+   if(tier>=3){
+     tone(root*1.255,.52,.010,'sine',1.045);
+     tone(root*3.99,.43,.006,'sine',.93);
+   }
  }
  else if(kind==='upgrade'){tone(570,.19,.037,'sine',1.5);tone(850,.24,.018,'sine',1.25)}
  else if(kind==='potion'){tone(190,.27,.065,'triangle',.52)}
  else if(kind==='blast'){tone(140,.28,.07,'sawtooth',.42);tone(270,.18,.045,'triangle',.28);tone(580,.24,.025,'sine',1.55)}
  else if(kind==='rare'){tone(940,.36,.036,'sine',1.6)} }
 function award(reward){if(reward<=0)return;score+=reward;caveEarned+=reward;refreshHud();if(!completed&&caveEarned>=caveGoal){completed=true;held=false;document.getElementById('finishtext').textContent='Cave '+cave+' cleared! '+caveEarned+' crystals collected in this cave.';document.getElementById('finish').style.display='flex'}}
-function shatter(n,reward){
+function shatter(n,reward,blastId=null){
  // Particles travel in world coordinates, so they stay aligned during movement.
  const pieces=Math.min(9,Math.max(4,4+reward));
  for(let i=0;i<pieces;i++){
   const a=(Math.PI*2*i/pieces)+rand(-.35,.35),speed=rand(.075,.20);
-  fragments.push({x:n.x,y:n.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,age:0,scatter:rand(220,350),groundWait:rand(130,260),duration:rand(800,1120),groundY:n.y+rand(12,23),landed:false,size:rand(2.5,5.5),color:n.rock?'#bdc5d9':n.color,crystalTier:n.rock?0:n.tier,reward:i<reward?1:0});
+  fragments.push({x:n.x,y:n.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,age:0,scatter:rand(220,350),groundWait:rand(130,260),duration:rand(800,1120),groundY:n.y+rand(12,23),landed:false,size:rand(2.5,5.5),color:n.rock?'#bdc5d9':n.color,crystalTier:n.rock?0:n.tier,blastId,reward:i<reward?1:0});
  }
  sfx('break');if(n.tier>=3)sfx('rare');
 }
-function mineNode(n,bonus=0,source='spell'){if(!n.alive)return 0;n.alive=false;const reward=n.rock?(Math.random()<.4?1:0)+bonus:n.tier+bonus;
+function mineNode(n,bonus=0,source='spell',blastId=null){if(!n.alive)return 0;n.alive=false;const reward=n.rock?(Math.random()<.4?1:0)+bonus:n.tier+bonus;
  earnXP(n);if(source==='companion'&&companion)companionGems+=reward;
- shatter(n,reward);
+ shatter(n,reward,blastId);
  if(!n.rock){const drop=Math.random();if(drop<.004){startCompanion('dragon')}else if(drop<.018){startCompanion('fairy')}else if(drop<.053){greenPotions++;sfx('potionFound');if(!seenFirstPotion){seenFirstPotion=true;prepareFirstPotionVein();queueDiscovery({kind:'potion'})}else showToast('🧪 Green potion found!')}}refreshHud();return reward;}
 function usePotion(){
  if(!greenPotions||completed||activeDiscovery||recordOpen)return;
@@ -450,17 +478,19 @@ function usePotion(){
  greenPotions--;sfx('blast');const radius=120;
  blastEffects.push({x:player.x,y:player.y,r:radius,life:650});
  let hits=0,crystals=0;
- // A blast counts actual gem rewards, not empty rocks.
+ const blastId=++blastSequence;
+ pendingBlast={id:blastId,remaining:0,collected:0};
+ // The achievement waits until every blast crystal has entered the bag.
  for(const n of [...nodes]){
   if(n.alive&&Math.hypot(n.x-player.x,n.y-player.y)<=radius+n.r){
    for(let i=0;i<8;i++)particles.push({x:n.x,y:n.y,vx:rand(-.2,.2),vy:rand(-.2,.1),life:rand(350,700),color:'#9dff8b'});
-   const reward=mineNode(n,1,'potion');
-   if(!n.rock)crystals+=reward;
+   const reward=mineNode(n,1,'potion',blastId);
+   if(!n.rock){crystals+=reward;pendingBlast.remaining+=reward;}
    hits++;if(completed)break;
   }
  }
  showToast(hits?'💥 '+crystals+' crystals blasted!':'💥 No crystals in range');
- queueRecord('potion',crystals);refreshHud();
+ finishBlastIfCollected();refreshHud();
 }
 function update(dt,t){if(creatorOpen||activeDiscovery||recordOpen||!document.getElementById('discoveryOverlay').hidden)return;camX=0;camY=0;if(completed&&fragments.length===0)return;stepPulse=Math.max(0,stepPulse-dt*.005);toastTimer=Math.max(0,toastTimer-dt);if(!toastTimer)document.getElementById('toast').classList.remove('visible');blastEffects=blastEffects.filter(b=>(b.life-=dt)>0);if(companionRemaining>0){companionMusicClock-=dt;if(companionMusicClock<=0){companionMusicClock+=companion==='fairy'?780:950;if(companion==='fairy'){tone(820,.22,.012,'sine',1.28);tone(1230,.28,.008,'sine',.92)}else{tone(185,.43,.015,'triangle',.82);tone(277,.39,.011,'sine',1.13)}}companionRemaining=Math.max(0,companionRemaining-dt);if(companionRemaining===0){const ended=companion;companion=null;queueRecord(ended,companionGems);companionGems=0;refreshHud()}}if(held&&!completed){walkCycle+=dt*.016;stepPulse=Math.min(1,stepPulse+dt*.012);let step=dt*.065*(1+speedBonus());distance+=step;worldTravel+=step;for(let n of nodes)n.y+=step;
  spawnFront+=step;fillAhead();
@@ -481,10 +511,18 @@ function update(dt,t){if(creatorOpen||activeDiscovery||recordOpen||!document.get
      const pull=.014+.13*progress;
      f.x+=(player.x-f.x)*Math.min(.9,pull*dt/16*3);
      f.y+=(player.y+13-f.y)*Math.min(.9,pull*dt/16*3);
-     if(progress>=1||Math.hypot(f.x-player.x,f.y-(player.y+13))<9){f.done=true;award(f.reward);if(f.reward){sfx('collect');if(f.crystalTier>0)sfx('crystalTinkle',f.crystalTier)}}
+     if(progress>=1||Math.hypot(f.x-player.x,f.y-(player.y+13))<9){f.done=true;award(f.reward);if(f.reward){
+   sfx('collect');
+   if(f.crystalTier>0)sfx('crystalTinkle',f.crystalTier);
+   if(pendingBlast&&f.blastId===pendingBlast.id&&f.crystalTier>0){
+     pendingBlast.remaining=Math.max(0,pendingBlast.remaining-1);
+     pendingBlast.collected++;
+   }
+ }}
    }
  }
  fragments=fragments.filter(f=>!f.done);
+ finishBlastIfCollected();
 }function frame(t){let dt=Math.min(t-last||16,50);last=t;update(dt,t);drawScene(t);for(let b of bolts){ctx.strokeStyle=b.color;ctx.shadowColor=b.color;ctx.shadowBlur=15;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(b.x,b.y);const end=worldToScreen(b.tx,b.ty);ctx.lineTo(b.x+(end.x-b.x)*b.p,b.y+(end.y-b.y)*b.p);ctx.stroke();ctx.shadowBlur=0}for(let p of particles){const q=worldToScreen(p.x,p.y);circle(q.x,q.y,3*zoomScale(),p.color)}for(const f of fragments){const q=worldToScreen(f.x,f.y);ctx.save();ctx.translate(q.x,q.y);ctx.rotate(f.age*.006);ctx.shadowColor=f.color;ctx.shadowBlur=6;ctx.fillStyle=f.color;const z=zoomScale();ctx.beginPath();ctx.moveTo(0,-f.size*z);ctx.lineTo(f.size*.8*z,0);ctx.lineTo(0,f.size*z);ctx.lineTo(-f.size*.8*z,0);ctx.closePath();ctx.fill();ctx.restore()}
  for(const b of blastEffects){ctx.save();ctx.beginPath();ctx.arc(b.x,b.y,b.r*zoomScale()*(1-b.life/650),0,Math.PI*2);ctx.strokeStyle='rgba(135,255,143,'+(b.life/650)+')';ctx.lineWidth=7;ctx.shadowColor='#8dff92';ctx.shadowBlur=24;ctx.stroke();ctx.restore()}radiusRing(t);goblin(t);drawCompanion(t);requestAnimationFrame(frame)}function paintBagIcon(){
  const c=document.getElementById('bagIcon'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
