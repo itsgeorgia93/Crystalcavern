@@ -1,0 +1,344 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 2.1</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
+#creator{position:fixed;inset:0;z-index:30;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;background:linear-gradient(#141b3b,#2d2851);color:#fff;padding:24px 18px calc(180px + env(safe-area-inset-bottom,0px));text-align:center;font-family:system-ui}
+#creator h1{margin:0 0 4px;font-size:25px}#creator p{margin:4px 0 12px;color:#d9d0f3;font-size:13px}
+#preview{width:210px;height:195px;display:block;margin:auto;background:#222c50;border-radius:20px}
+.creatorGroup{max-width:420px;margin:12px auto;text-align:left;font-size:13px;font-weight:750}
+.choices{display:flex;gap:7px;margin-top:7px}.choices button{flex:1;min-width:0;background:#39355f;color:white;border:1px solid #716d9e;border-radius:12px;padding:10px 4px;font-size:12px;font-weight:700}
+.choices button.active,.swatches button.active{outline:3px solid #dfc4ff;outline-offset:1px}
+.swatches{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin-top:8px}.swatches button{aspect-ratio:1;border:2px solid #ffffff77;border-radius:10px;min-width:0;padding:0}
+#gn{width:100%;padding:12px;border-radius:12px;border:1px solid #afa0d6;background:#28284a;color:white;font-size:17px;margin-top:8px}
+#startGoblin{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:50%;transform:translateX(-50%);z-index:40;width:min(calc(100% - 36px),420px);min-height:58px;touch-action:manipulation;cursor:pointer;box-shadow:0 0 0 8px #2d2851,0 8px 24px #0b0b24aa;background:#b9f2d0;color:#233e34;border:0;border-radius:18px;font-weight:900;padding:16px 28px;font-size:17px;margin:15px auto 10px;display:block}
+#intro{position:fixed;inset:0;background:#171d3eea;color:white;z-index:29;display:none;align-items:center;justify-content:center;text-align:center;font-size:27px;font-weight:850;padding:24px}
+
+
+/* v1.9: minimal mobile HUD and tucked-away menu */
+.hud{top:auto!important;right:auto!important;left:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 258px)!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;z-index:3!important}
+.hud .pill{font-size:13px!important;padding:7px 10px!important;white-space:nowrap!important}
+#count{display:flex;align-items:center;gap:6px;min-height:38px;font-size:17px!important}
+#bagIcon{width:25px;height:29px;display:block;flex:none}
+#menuToggle{position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 112px);z-index:7;border:1px solid #bda8f5;background:#342b63;color:#fff;border-radius:16px;width:48px;height:45px;font-size:25px;font-weight:700}
+#gameMenu{position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 166px);z-index:8;background:#28234c;color:#fff;border:1px solid #bda8f5;border-radius:18px;padding:14px;box-shadow:0 8px 32px #080c22aa;width:min(245px,calc(100vw - 24px));font-weight:700}
+#gameMenu[hidden]{display:none!important}
+#gameMenu button{display:block;width:100%;margin-top:10px;background:#443766;border:1px solid #9682c7;color:#fff;border-radius:12px;padding:11px;text-align:left;font-weight:700}
+#gameMenu .menuHeading{font-size:17px}
+#gameMenu .menuNote{font-size:12px;color:#c6b9df;font-weight:500;margin-top:12px}
+#toast{top:50%!important;transform:translate(-50%,-50%)!important;text-align:center;max-width:75vw;padding:12px 18px;background:#232044df;border:1px solid #bca9e8;border-radius:16px;box-shadow:0 8px 24px #080c2255;font-size:16px;opacity:0;transition:opacity .25s ease}
+#toast.visible{opacity:1}
+#progress{top:auto!important;left:12px!important;right:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 209px)!important;max-width:min(65vw,320px)!important;font-size:12px!important;line-height:1.3!important;z-index:3!important}
+@media(max-width:390px){#progress{max-width:62vw!important;font-size:11px!important}.hud .pill{font-size:12px!important}}
+#speed{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 60px);background:#244d5c;color:#fff;border:1px solid #8fe3e7;border-radius:20px;padding:10px;font-weight:750;z-index:2;max-width:55vw}#speed[hidden]{display:none!important}#speed:disabled{opacity:.6}
+
+/* v2.0.1 comfort layout: top controls, no HUD over the walking area */
+.hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;bottom:auto!important;left:12px!important;right:auto!important}
+#progress{top:calc(env(safe-area-inset-top,0px) + 65px)!important;bottom:auto!important;left:12px!important;max-width:48vw!important}
+#menuToggle{top:calc(env(safe-area-inset-top,0px) + 110px)!important;bottom:auto!important}
+#gameMenu{top:calc(env(safe-area-inset-top,0px) + 165px)!important;bottom:auto!important}
+#upgrade,#power,#speed{right:12px!important;bottom:auto!important;max-width:53vw!important;font-size:12px!important;padding:9px 10px!important;min-height:39px!important}
+#upgrade{top:calc(env(safe-area-inset-top,0px) + 12px)!important}
+#power{top:calc(env(safe-area-inset-top,0px) + 59px)!important}
+#speed{top:calc(env(safe-area-inset-top,0px) + 106px)!important}
+#potion{right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 66px)!important}
+.title{display:none}
+@media(max-width:390px){#upgrade,#power,#speed{font-size:11px!important;padding:8px!important}}
+/* v2.0.2: reserve a reliable tap-safe header on mobile browsers. */
+:root{--hud-top:max(62px, calc(env(safe-area-inset-top,0px) + 18px))}
+.hud{top:var(--hud-top)!important;z-index:12!important}
+#progress{top:calc(var(--hud-top) + 51px)!important;z-index:12!important}
+#menuToggle{top:calc(var(--hud-top) + 95px)!important;z-index:15!important;left:12px!important;min-width:48px;min-height:48px}
+#gameMenu{top:calc(var(--hud-top) + 148px)!important;z-index:16!important}
+#upgrade,#power,#speed{z-index:14!important;right:12px!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;max-width:55vw!important}
+#upgrade{top:var(--hud-top)!important}
+#power{top:calc(var(--hud-top) + 49px)!important}
+#speed{top:calc(var(--hud-top) + 98px)!important}
+#speed[hidden]{display:none!important}
+#potion{z-index:14!important}
+/* v2.1: Safari's top toolbar can cover the top of the visual viewport.
+   Keep ALL controls well inside the visible play area, independent of env(safe-area). */
+:root{--hud-top:155px}
+.hud{top:var(--hud-top)!important}
+#progress{top:calc(var(--hud-top) + 52px)!important}
+#menuToggle{top:calc(var(--hud-top) + 100px)!important}
+#gameMenu{top:calc(var(--hud-top) + 156px)!important}
+#upgrade{top:var(--hud-top)!important}
+#power{top:calc(var(--hud-top) + 49px)!important}
+#speed{top:calc(var(--hud-top) + 98px)!important}
+#upgrade,#power,#speed{min-height:43px!important;max-width:51vw!important}
+@media(max-height:650px){:root{--hud-top:105px}}
+</style></head><body><button id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button><div id="gameMenu" hidden><div class="menuHeading">⚙️ Menu</div><button id="wardrobe" type="button">🧌 Edit goblin</button><button id="soundToggle" type="button">🔊 Sound effects: On</button><div class="menuNote">Gentle sounds • no background music yet</div><button id="menuClose" type="button">Close</button></div><div id="intro"></div><div id="creator"><h1>✨ Create your goblin ✨</h1><p>Every little miner deserves a look of their own</p><canvas id="preview" width="420" height="390"></canvas><div class="creatorGroup">Body<div class="choices" id="bodyChoices"></div></div><div class="creatorGroup">Expression<div class="choices" id="faceChoices"></div></div><div class="creatorGroup">Hair length<div class="choices" id="hairChoices"></div></div><div class="creatorGroup">Hair colour<div class="swatches" id="hairChoicesColor"></div></div><div class="creatorGroup">Bag design<div class="swatches" id="bagChoices"></div></div><div class="creatorGroup">Name your goblin<input id="gn" maxlength="20" placeholder="Dave" value="Dave" autocomplete="off"/></div><button id="startGoblin">⛏️ Off to work!</button></div><canvas id="game"></canvas><div class="hud"><div class="pill" id="count"><canvas id="bagIcon" width="32" height="36" aria-hidden="true"></canvas><span id="bagCount">0</span></div></div><button id="upgrade" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 164px);background:#342b63;color:white;border:1px solid #bda8f5;border-radius:20px;padding:10px;font-weight:750;z-index:2">✨ Radius Level Up · 5💎</button><button id="power" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 112px);background:#4d315d;color:white;border:1px solid #f4b7ed;border-radius:20px;padding:10px;font-weight:750;z-index:2">⚡ Spell Power Up · 4💎</button><button id="speed" type="button" hidden>👟 Speed Up · 12💎</button><div id="progress" style="position:fixed;top:calc(env(safe-area-inset-top,12px) + 66px);left:12px;color:#f9edff;background:#1b2147dd;border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;pointer-events:none">💎 0 / 100 · Cave 2</div><button id="potion" aria-label="Use green blast potion" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 225px);min-width:64px;min-height:66px;z-index:3;background:#183f3ae8;border:2px solid #77e9a6;border-radius:18px;color:white;font-size:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:manipulation"><span>🧪</span><span id="potioncount" style="font-size:13px;font-weight:800">× 0</span></button><div id="toast" style="position:fixed;top:39%;left:50%;transform:translateX(-50%);color:#d2ffe0;font-weight:800;text-shadow:0 2px 6px #142d22;pointer-events:none;z-index:4"></div><div id="finish" style="display:none;position:fixed;inset:0;background:#10152ddc;z-index:5;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;gap:18px;padding:24px"><div style="font-size:32px;font-weight:850">✨ Cave complete! ✨</div><div id="finishtext">You collected enough crystals!</div><button id="next" style="background:#7055b2;color:white;border:1px solid #dfcaff;border-radius:24px;padding:15px 26px;font-size:18px;font-weight:750">Enter next cave →</button></div><div class="title">✦ CRYSTAL CAVERN v2.1.1 ✦</div><div class="hint">👆 Hold to explore • ✨ Auto-mine • 💎 Reach the cave goal</div><script>
+const custom={body:1,face:'cute',hair:'medium',hairColor:'#f58cc8',bag:9,name:'Dave'};
+const hairColors=['#49332f','#a66b43','#e9c879','#f0e6d7','#242332','#f58cc8','#a66de4','#53bd79','#54a9e9','#e85a58'];
+const bagColors=[['#e64d55'],['#f59e3d'],['#f4d35e'],['#4cbf8b'],['#438de5'],['#a777d4'],['#e88fb8'],['#202b42'],['#f3e8cf'],['#e94e4e','#f4a640','#f5e35e','#4ebf75','#498fe0','#985fc4'],['#d52d00','#f18f56','#fff','#d66ca5','#a30262'],['#d60270','#a14d9b','#0038a8'],['#5bcefa','#f5a9b8','#fff','#f5a9b8','#5bcefa'],['#fcf434','#fff','#9c59d1','#2c2c2c'],['#000','#a3a3a3','#fff','#800080']];
+let creatorOpen=true,started=false;
+
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');let W,H,dpr,now=0,last=0,elapsed=0,score=0;const player={x:0,y:0},target={x:0,y:0};let held=false,looking=false,gesture=null,camX=0,camY=0,particles=[],fragments=[],bolts=[],nodes=[],distance=0,spellRadius=48,spellPower=1,powerCost=4,rangeCost=5,stepPulse=0,cave=1,caveEarned=0,caveGoal=100,caveLength=4200,completed=false,worldTravel=0,greenPotions=0,companion=null,companionRemaining=0,blastEffects=[],toastTimer=0;const rand=(a,b)=>a+Math.random()*(b-a);function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);player.x=W/2;player.y=H*.53;target.x=player.x;target.y=player.y;spawn()}let nodeSerial=0,spawnFront=0,speedLevel=1,speedCost=12;
+function zoomScale(){return Math.max(.65,1-Math.max(0,cave-2)*.018)}
+function worldToScreen(x,y){const z=zoomScale();return {x:player.x+(x-player.x)*z,y:player.y+(y-player.y)*z}}
+function speedBonus(){let b=0;for(let i=1;i<speedLevel;i++)b+=i<=5?.04:i<=10?.03:.02;return Math.min(.65,b)}
+
+function caveDensity(){return Math.min(5.1,1+(cave-1)*.38)}
+function spawn(){
+ nodes=[];nodeSerial=0;spawnFront=player.y-40;
+ fillAhead();
+}
+function fillAhead(){
+ const gap=Math.max(12,34/caveDensity());
+ while(spawnFront> player.y-(H*.95)/zoomScale()){
+   nodes.push(makeNode(spawnFront,nodeSerial++));
+   // From cave 3, new crystal-rich side lanes encourage radius upgrades.
+   // All lanes share the same forward path movement to avoid sideways camera drift.
+   if(cave>=3){
+     const extra=cave>=7?3:cave>=4?2:1;
+     for(let j=0;j<extra;j++){
+       const n=makeNode(spawnFront+(j%2)*gap*.36,nodeSerial++);
+       n.rock=Math.random()<(cave>=4?.16:.30);
+       if(!n.rock){n.tier=Math.random()<.12?3:Math.random()<.32?2:1;n.hp=n.tier===3?9:n.tier===2?5:2;n.maxHp=n.hp;n.r=n.tier===3?24:n.tier===2?19:15;n.color=n.tier===3?'#ffb85c':n.tier===2?'#d7a1ff':'#79f4e9';
+         const side=j%2?-1:1;
+         n.x=W/2+side*rand(W*.20,Math.min(W*.41,160));
+       }else{n.tier=0;n.hp=1;n.maxHp=1;n.r=11;n.color='#a2a3b2';n.x=W/2+(j%2?-1:1)*rand(9,30)}
+       nodes.push(n);
+     }
+   }
+   spawnFront-=gap;
+ }
+}
+function makeNode(y,i){
+ // Easy rocks form the starter mining lane. Crystals are intentionally
+ // OUTSIDE the initial 48px spell radius, making radius upgrades meaningful.
+ const rockChance=Math.max(.30,.72-(cave-1)*.045);
+ const rock=Math.random()<rockChance;
+ const rare=!rock&&Math.random()<Math.min(.22,.045+cave*.013);
+ const uncommon=!rock&&!rare&&Math.random()<Math.min(.45,.18+cave*.025);
+ const side=i%2?-1:1;
+ const halfPath=W*.245;
+ // Starter rocks sit within easy mining range. Gems occupy farther lanes.
+ // Once players buy radius, the outer crystal deposits become accessible.
+ const rockOffset=rand(8,Math.min(halfPath*.38,33));
+ const crystalMin=Math.min(halfPath*.88,83);
+ const crystalMax=Math.max(crystalMin+2,halfPath*.98);
+ const offset=rock?rockOffset:rand(crystalMin,crystalMax);
+ const tier=rock?0:rare?3:uncommon?2:1;
+ const hp=rock?1:rare?9:uncommon?5:2;
+ return {x:W/2+side*offset,y,hp,maxHp:hp,r:rock?11:rare?24:uncommon?19:15,
+ color:rock?'#a2a3b2':rare?'#ffb85c':uncommon?'#d7a1ff':'#79f4e9',tier,rock,alive:true};
+}
+canvas.addEventListener('pointerdown',e=>{if(creatorOpen||completed)return;e.preventDefault();held=true;canvas.setPointerCapture(e.pointerId)});
+function endGesture(){held=false}
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>canvas.addEventListener(t,endGesture));
+function circle(x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill()}function crystal(n){const {x,y,r,color}=n;
+if(n.rock){ctx.save();ctx.translate(x,y);ctx.fillStyle='#858a9d';ctx.strokeStyle='#c3c5d1';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-r,-r*.1);ctx.lineTo(-r*.65,-r*.75);ctx.lineTo(r*.25,-r);ctx.lineTo(r,r*.1);ctx.lineTo(r*.55,r*.8);ctx.lineTo(-r*.55,r*.7);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();return;}
+ctx.save();ctx.translate(x,y);ctx.shadowColor=color;ctx.shadowBlur=17;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(r*.8,-r*.35);ctx.lineTo(r*.55,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.shadowBlur=0;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(0,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle='#ffffff55';ctx.fill();ctx.strokeStyle='#f9efff';ctx.lineWidth=1.5;ctx.stroke();ctx.restore()}function drawScene(t){let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0c1530');bg.addColorStop(.6,'#203357');bg.addColorStop(1,'#31425b');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);for(let side of [-1,1]){ctx.fillStyle=side<0?'#172846':'#1a2c4c';ctx.beginPath();ctx.moveTo(side<0?0:W,0);ctx.lineTo(W/2+side*W*.19,H*.13);ctx.lineTo(W/2+side*W*.46,H);ctx.lineTo(side<0?0:W,H);ctx.fill()}ctx.beginPath();ctx.moveTo(W*.24,H*.10);ctx.lineTo(W*.76,H*.10);ctx.lineTo(W*.96,H);ctx.lineTo(W*.04,H);ctx.closePath();let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#364767');g.addColorStop(1,'#66748c');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#91a3c344';ctx.lineWidth=3;ctx.stroke();for(let i=0;i<40;i++){let x=(i*137.3)%W,y=(i*83.7)%H;circle(x,y,1.2+Math.sin(t*.001+i)*.8,['#85f8fa88','#f5a3f388','#ffe0a688'][i%3])}ctx.save();ctx.translate(player.x,player.y);ctx.scale(zoomScale(),zoomScale());ctx.translate(-player.x,-player.y);for(let n of nodes)if(n.alive)crystal(n);ctx.restore()}function radiusRing(t){ctx.save();ctx.beginPath();ctx.ellipse(player.x,player.y+8,spellRadius*zoomScale(),spellRadius*.48*zoomScale(),0,0,Math.PI*2);ctx.strokeStyle='#b3faff77';ctx.lineWidth=2;ctx.setLineDash([7,7]);ctx.lineDashOffset=-t*.018;ctx.shadowColor='#7df9fa';ctx.shadowBlur=10;ctx.stroke();ctx.setLineDash([]);ctx.restore()}function paintGoblin(c,x,y,scale=1,front=false,t=0){
+ c.save();c.translate(x,y);c.scale(scale,scale);
+ const width=[16,20,25][custom.body],hair=custom.hairColor;
+ c.fillStyle='#101a2a88';c.beginPath();c.ellipse(0,35,30,9,0,0,Math.PI*2);c.fill();
+ // Body and feet
+ c.fillStyle='#69528e';c.beginPath();c.ellipse(0,16,width+5,24,0,0,Math.PI*2);c.fill();
+ c.fillStyle='#65518e';for(const fx of [-width*.6,width*.6]){c.beginPath();c.ellipse(fx,35,9,7,0,0,Math.PI*2);c.fill()}
+ // Ears
+ c.fillStyle='#8bca99';c.beginPath();c.moveTo(-17,-11);c.lineTo(-34,-21);c.lineTo(-23,4);c.moveTo(17,-11);c.lineTo(34,-21);c.lineTo(23,4);c.fill();
+ // Hair silhouette: on the front, keep hair OUTSIDE the face and chin.
+ // On the back, let longer hair flow visibly down the back above the sack.
+ c.fillStyle=hair;
+ if(front){
+   if(custom.hair==='medium'||custom.hair==='long'){
+     const bottom=custom.hair==='long'?31:5;
+     for(const side of [-1,1]){
+       c.beginPath();c.moveTo(side*16,-33);
+       c.quadraticCurveTo(side*29,-32,side*27,-9);
+       c.quadraticCurveTo(side*29,bottom-7,side*22,bottom);
+       c.lineTo(side*20,-6);c.lineTo(side*17,-29);c.closePath();c.fill();
+     }
+   }
+ }else{
+   if(custom.hair!=='short'){
+     const bottom=custom.hair==='long'?34:13;
+     c.beginPath();c.moveTo(-19,-30);c.quadraticCurveTo(-30,-11,-24,bottom);
+     c.quadraticCurveTo(0,bottom+7,24,bottom);
+     c.quadraticCurveTo(30,-11,19,-30);c.closePath();c.fill();
+   }
+ }
+ // Head
+ c.fillStyle='#8bca99';c.beginPath();c.ellipse(0,-15,21,22,0,0,Math.PI*2);c.fill();
+ if(front){
+ c.fillStyle='#243840';if(custom.face==='laugh'){c.strokeStyle='#243840';c.lineWidth=2.4;for(let ex of [-8,8]){c.beginPath();c.arc(ex,-18,4,Math.PI,0);c.stroke()}c.fillStyle='#65334b';c.beginPath();c.ellipse(0,-6,7,6,0,0,Math.PI*2);c.fill()}
+ else{for(let ex of [-8,8]){c.beginPath();c.ellipse(ex,-17,3,4,0,0,Math.PI*2);c.fill()}c.strokeStyle='#34594a';c.lineWidth=2;c.beginPath();if(custom.face==='angry'){c.moveTo(-13,-24);c.lineTo(-4,-20);c.moveTo(13,-24);c.lineTo(4,-20);c.moveTo(-6,-4);c.quadraticCurveTo(0,-10,6,-4)}else{c.arc(0,-8,6,.1,Math.PI-.1)}c.stroke()}
+ }
+ // Hair cap and fringe sit ON TOP of the forehead, not around the jaw.
+ c.fillStyle=hair;c.beginPath();
+ c.moveTo(-21,-22);c.quadraticCurveTo(-24,-44,0,-40);
+ c.quadraticCurveTo(24,-44,21,-22);
+ if(front){c.lineTo(14,-28);c.lineTo(5,-24);c.lineTo(-5,-29);c.lineTo(-13,-24);}
+ else{c.lineTo(15,-17);c.quadraticCurveTo(0,-22,-15,-17);}
+ c.closePath();c.fill();
+ // True rear view: the whole visible skull is hair, not a blank green face.
+ // Keep the ears exposed and the silhouette readable with every body option.
+ if(!front){
+   c.fillStyle=hair;
+   c.beginPath();c.ellipse(0,-15,21.5,22.5,0,0,Math.PI*2);c.fill();
+   c.fillStyle='rgba(255,255,255,.12)';
+   c.beginPath();c.moveTo(-12,-30);c.quadraticCurveTo(-4,-35,2,-34);c.strokeStyle='rgba(255,255,255,.14)';c.lineWidth=1.5;c.stroke();
+   if(custom.hair==='short'){
+     c.fillStyle=hair;c.beginPath();c.moveTo(-21,-15);c.lineTo(-23,-24);c.lineTo(-15,-21);c.lineTo(-11,-34);c.lineTo(-3,-28);c.lineTo(6,-37);c.lineTo(12,-27);c.lineTo(23,-24);c.lineTo(20,-12);c.quadraticCurveTo(0,-4,-21,-12);c.fill();
+   }else{
+     const bottom=custom.hair==='long'?35:12;
+     c.fillStyle=hair;c.beginPath();c.moveTo(-19,-26);c.quadraticCurveTo(-29,-10,-23,bottom);c.quadraticCurveTo(-10,bottom+5,0,bottom-1);c.quadraticCurveTo(10,bottom+5,23,bottom);c.quadraticCurveTo(29,-10,19,-26);c.closePath();c.fill();
+     c.strokeStyle='rgba(0,0,0,.16)';c.lineWidth=1.2;c.beginPath();c.moveTo(0,-29);c.quadraticCurveTo(4,-8,0,Math.min(bottom,17));c.stroke();
+   }
+ }
+ // Creator shows a small side bag. Gameplay: sack is centered and dominant,
+ // while the crown of the hairstyle, ears, shoulders and feet remain visible.
+ const stripes=bagColors[custom.bag];
+ if(front){
+   const bx=28,by=13,bs=14+Math.min(score,50)*.20;
+   c.save();c.beginPath();c.ellipse(bx,by,bs*.95,bs*1.13,-.14,0,Math.PI*2);c.clip();
+   stripes.forEach((col,i)=>{c.fillStyle=col;c.fillRect(bx-bs,by-bs*1.2+i*(bs*2.4/stripes.length),bs*2,bs*2.4/stripes.length+1)});
+   c.restore();c.strokeStyle='#e5d5af';c.lineWidth=2.5;c.beginPath();c.ellipse(bx,by,bs*.95,bs*1.13,-.14,0,Math.PI*2);c.stroke();
+ }else{
+   // Straps sit behind the main sack and show at the shoulders.
+   c.strokeStyle='#d9c39e';c.lineWidth=4;c.lineCap='round';
+   c.beginPath();c.moveTo(-17,-1);c.lineTo(-18,20);c.moveTo(17,-1);c.lineTo(18,20);c.stroke();
+   // Bigger sack, but capped so it never hides the hair or feet.
+   const bs=19+Math.min(score,50)*.055,bx=0,by=14;
+   c.save();c.beginPath();c.ellipse(bx,by,bs*1.08,bs*1.06,0,0,Math.PI*2);c.clip();
+   stripes.forEach((col,i)=>{c.fillStyle=col;c.fillRect(-bs*1.2,by-bs*1.1+i*(bs*2.2/stripes.length),bs*2.4,bs*2.2/stripes.length+1)});
+   c.restore();
+   c.strokeStyle='#e5d5af';c.lineWidth=3;c.beginPath();c.ellipse(bx,by,bs*1.08,bs*1.06,0,0,Math.PI*2);c.stroke();
+   // Sack closure at the top, like a little gathered drawstring.
+   c.strokeStyle='#f0dfbd';c.lineWidth=2.5;c.beginPath();c.moveTo(-9,by-bs*.72);c.quadraticCurveTo(0,by-bs*.9,9,by-bs*.72);c.stroke();
+ }
+ c.restore();
+}
+function goblin(t){paintGoblin(ctx,player.x,player.y+Math.sin(t*.003)*1,1,false,t)}
+function showToast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('visible');toastTimer=1600}
+
+function spellStats(){
+ // Every third upgrade strengthens all shots; the others add a shot.
+ const upgrades=spellPower-1;
+ return {shots:1+upgrades-Math.floor(upgrades/3),damage:1+Math.floor(upgrades/3)};
+}
+function startCompanion(type){
+ companion=type;companionRemaining=10000;companionMusicClock=0;
+ showToast(type==='fairy'?'🧚 A fairy joins for 10 seconds!':'🐉 A baby dragon joins for 10 seconds!');
+ refreshHud();
+}
+function castVolley(){
+ const stats=spellStats();
+ const extra=companion==='fairy'?1:companion==='dragon'?2:0;
+ const available=nodes.filter(n=>n.alive&&Math.hypot(n.x-player.x,n.y-player.y)<=spellRadius+n.r)
+   .sort((a,b)=>(a.rock?0:1)-(b.rock?0:1)||Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y)||b.tier-a.tier);
+ if(!available.length)return;
+ // Distribute shots before doubling up on the same crystal.
+ for(let i=0;i<stats.shots+extra;i++){
+  const n=available[i%available.length];
+  const helper=i>=stats.shots;
+  const originX=helper?player.x+(companion==='dragon'?30:-30):player.x;
+  const originY=helper?player.y-55:player.y-20;
+  bolts.push({x:originX,y:originY,tx:n.x,ty:n.y,node:n,p:0,
+   damage:helper?(companion==='dragon'?2:1):stats.damage,
+   color:helper?(companion==='dragon'?'#ffb96b':'#c8ffbd'):'#9cfbff'});
+ }
+}
+function drawCompanion(t){
+ if(!companion||companionRemaining<=0)return;
+ const x=player.x+(companion==='dragon'?36:-36),y=player.y-61+Math.sin(t*.007)*5;
+ ctx.save();ctx.shadowBlur=14;ctx.shadowColor=companion==='dragon'?'#ffba75':'#a6ffcf';
+ circle(x,y,companion==='dragon'?12:8,companion==='dragon'?'#b59cff':'#baffd7');
+ circle(x-8,y-6,5,'#ffffff99');circle(x+8,y-6,5,'#ffffff99');
+ ctx.restore();
+ ctx.font='16px system-ui';ctx.textAlign='center';ctx.fillText(companion==='dragon'?'🐉':'🧚',x,y-14);
+ ctx.fillStyle='#17243c';ctx.fillRect(x-21,y+16,42,5);
+ ctx.fillStyle='#92f3bc';ctx.fillRect(x-21,y+16,42*companionRemaining/10000,5);
+}
+// Gentle synthesized effects: no external audio files, no autoplay.
+let audioCtx=null,soundOn=true,lastTink=0,lastPlink=0,lastCrumble=0,companionMusicClock=0;
+function wakeAudio(){if(!soundOn)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){audioCtx=null}}
+function tone(freq=620,duration=.09,volume=.028,type='sine',slide=1){
+ if(!soundOn||!audioCtx||audioCtx.state!=='running')return;
+ try{const t=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(Math.max(70,freq*slide),t+duration);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration+.01)}catch(e){}
+}
+function sfx(kind){const t=performance.now();if(kind==='hit'){if(t-lastTink<110)return;lastTink=t;tone(370+rand(0,100),.075,.016,'triangle',.72)}
+ else if(kind==='break'){tone(410+rand(0,150),.13,.028,'triangle',.5)}
+ else if(kind==='crumble'){if(t-lastCrumble<110)return;lastCrumble=t; tone(160+rand(0,70),.09,.017,'triangle',.55);tone(90+rand(0,45),.14,.012,'sawtooth',.65)}
+ else if(kind==='potionFound'){tone(540,.12,.022,'sine',1.4);tone(810,.24,.026,'sine',1.32);tone(1080,.35,.013,'triangle',1.1)}
+ else if(kind==='collect'){if(t-lastPlink<72)return;lastPlink=t;tone(740+rand(0,220),.115,.026,'sine',1.35)}
+ else if(kind==='upgrade'){tone(570,.19,.037,'sine',1.5);tone(850,.24,.018,'sine',1.25)}
+ else if(kind==='potion'){tone(190,.27,.065,'triangle',.52)}
+ else if(kind==='rare'){tone(940,.36,.036,'sine',1.6)} }
+function award(reward){if(reward<=0)return;score+=reward;caveEarned+=reward;refreshHud();if(!completed&&caveEarned>=caveGoal){completed=true;held=false;document.getElementById('finishtext').textContent='Cave '+cave+' cleared! '+caveEarned+' crystals collected in this cave.';document.getElementById('finish').style.display='flex'}}
+function shatter(n,reward){
+ // Particles travel in world coordinates, so they stay aligned during movement.
+ const pieces=Math.min(9,Math.max(4,4+reward));
+ for(let i=0;i<pieces;i++){
+  const a=(Math.PI*2*i/pieces)+rand(-.35,.35),speed=rand(.075,.20);
+  fragments.push({x:n.x,y:n.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,age:0,scatter:rand(220,350),groundWait:rand(130,260),duration:rand(800,1120),groundY:n.y+rand(12,23),landed:false,size:rand(2.5,5.5),color:n.rock?'#bdc5d9':n.color,reward:i<reward?1:0});
+ }
+ sfx('break');if(n.tier>=3)sfx('rare');
+}
+function mineNode(n,bonus=0){if(!n.alive)return;n.alive=false;const reward=n.rock?(Math.random()<.4?1:0)+bonus:n.tier+bonus;
+ shatter(n,reward);
+ if(!n.rock){const drop=Math.random();if(drop<.004){startCompanion('dragon')}else if(drop<.018){startCompanion('fairy')}else if(drop<.053){greenPotions++;sfx('potionFound');showToast('🧪 Green potion found!')}}refreshHud();}
+function usePotion(){if(!greenPotions||completed)return;greenPotions--;sfx('potion');const radius=120;blastEffects.push({x:player.x,y:player.y,r:radius,life:650});let hits=0;for(const n of nodes){if(n.alive&&Math.hypot(n.x-player.x,n.y-player.y)<=radius+n.r){for(let i=0;i<8;i++)particles.push({x:n.x,y:n.y,vx:rand(-.2,.2),vy:rand(-.2,.1),life:rand(350,700),color:'#9dff8b'});mineNode(n,1);hits++;if(completed)break}}showToast(hits?'💥 '+hits+' crystals blasted!':'💥 No crystals in range');refreshHud()}
+function update(dt,t){if(creatorOpen)return;camX=0;camY=0;if(completed&&fragments.length===0)return;stepPulse=Math.max(0,stepPulse-dt*.005);toastTimer=Math.max(0,toastTimer-dt);if(!toastTimer)document.getElementById('toast').classList.remove('visible');blastEffects=blastEffects.filter(b=>(b.life-=dt)>0);if(companionRemaining>0){companionMusicClock-=dt;if(companionMusicClock<=0){companionMusicClock+=companion==='fairy'?780:950;if(companion==='fairy'){tone(820,.22,.012,'sine',1.28);tone(1230,.28,.008,'sine',.92)}else{tone(185,.43,.015,'triangle',.82);tone(277,.39,.011,'sine',1.13)}}companionRemaining=Math.max(0,companionRemaining-dt);if(companionRemaining===0){companion=null;refreshHud()}}if(held&&!completed){stepPulse=Math.min(1,stepPulse+dt*.012);let step=dt*.065*(1+speedBonus());distance+=step;worldTravel+=step;for(let n of nodes)n.y+=step;
+ spawnFront+=step;fillAhead();
+ // Cleared or passed nodes never return: exploration is the source of new loot.
+ nodes=nodes.filter(n=>n.y<player.y+(H*.7+80)/zoomScale());}elapsed+=dt;if(elapsed>=2000){elapsed-=2000;castVolley()}for(let b of bolts){b.p+=dt/260;if(b.p>=1&&!b.done){b.done=true;if(b.node.alive){b.node.hp=Math.max(0,b.node.hp-b.damage);sfx('hit');for(let i=0;i<5;i++)particles.push({x:b.node.x,y:b.node.y,vx:rand(-.13,.13),vy:rand(-.2,.04),life:rand(400,750),color:b.node.color});if(b.node.hp<=0){mineNode(b.node)}}}}bolts=bolts.filter(b=>!b.done);for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);
+ for(const f of fragments){
+   f.age+=dt;
+   if(f.age<f.scatter){
+     // Shards burst outward then tumble down with gravity.
+     f.x+=f.vx*dt;f.y+=f.vy*dt;
+     f.vy+=.0017*dt;f.vx*=Math.pow(.985,dt/16);
+     if(f.y>f.groundY){f.y=f.groundY;f.vy=0;f.vx*=.25;if(!f.landed){f.landed=true;sfx('crumble')}}
+   }else if(f.age<f.scatter+f.groundWait){
+     if(!f.landed){f.landed=true;sfx('crumble')}
+     f.y=Math.min(f.groundY,f.y+dt*.16);
+   }else{
+     const progress=Math.min(1,(f.age-f.scatter-f.groundWait)/(f.duration-f.scatter-f.groundWait));
+     const pull=.014+.13*progress;
+     f.x+=(player.x-f.x)*Math.min(.9,pull*dt/16*3);
+     f.y+=(player.y+13-f.y)*Math.min(.9,pull*dt/16*3);
+     if(progress>=1||Math.hypot(f.x-player.x,f.y-(player.y+13))<9){f.done=true;award(f.reward);if(f.reward)sfx('collect')}
+   }
+ }
+ fragments=fragments.filter(f=>!f.done);
+}function frame(t){let dt=Math.min(t-last||16,50);last=t;update(dt,t);drawScene(t);for(let b of bolts){ctx.strokeStyle=b.color;ctx.shadowColor=b.color;ctx.shadowBlur=15;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(b.x,b.y);const end=worldToScreen(b.tx,b.ty);ctx.lineTo(b.x+(end.x-b.x)*b.p,b.y+(end.y-b.y)*b.p);ctx.stroke();ctx.shadowBlur=0}for(let p of particles){const q=worldToScreen(p.x,p.y);circle(q.x,q.y,3*zoomScale(),p.color)}for(const f of fragments){const q=worldToScreen(f.x,f.y);ctx.save();ctx.translate(q.x,q.y);ctx.rotate(f.age*.006);ctx.shadowColor=f.color;ctx.shadowBlur=6;ctx.fillStyle=f.color;const z=zoomScale();ctx.beginPath();ctx.moveTo(0,-f.size*z);ctx.lineTo(f.size*.8*z,0);ctx.lineTo(0,f.size*z);ctx.lineTo(-f.size*.8*z,0);ctx.closePath();ctx.fill();ctx.restore()}
+ for(const b of blastEffects){ctx.save();ctx.beginPath();ctx.arc(b.x,b.y,b.r*zoomScale()*(1-b.life/650),0,Math.PI*2);ctx.strokeStyle='rgba(135,255,143,'+(b.life/650)+')';ctx.lineWidth=7;ctx.shadowColor='#8dff92';ctx.shadowBlur=24;ctx.stroke();ctx.restore()}radiusRing(t);goblin(t);drawCompanion(t);requestAnimationFrame(frame)}function paintBagIcon(){
+ const c=document.getElementById('bagIcon'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
+ const colors=bagColors[custom.bag]||bagColors[0];
+ g.save();g.beginPath();g.moveTo(8,8);g.quadraticCurveTo(16,4,24,8);g.quadraticCurveTo(31,18,27,29);g.quadraticCurveTo(16,35,5,29);g.quadraticCurveTo(1,18,8,8);g.closePath();g.clip();
+ colors.forEach((color,i)=>{g.fillStyle=color;g.fillRect(0,i*36/colors.length,32,36/colors.length+1)});g.restore();
+ g.strokeStyle='#f3deb5';g.lineWidth=2.5;g.stroke();g.beginPath();g.moveTo(8,9);g.quadraticCurveTo(16,5,24,9);g.stroke();
+}
+function refreshHud(){
+ document.getElementById('bagCount').textContent=score;
+ paintBagIcon();
+ document.getElementById('power').textContent='⚡ Spell Power Up · '+powerCost+'💎';
+ document.getElementById('upgrade').textContent='✨ Radius Level Up · '+rangeCost+'💎';
+ document.getElementById('potioncount').textContent='× '+greenPotions;
+ document.getElementById('potion').style.opacity=greenPotions?'1':'.55';
+ document.getElementById('power').title=powerCost+' crystals';
+ document.getElementById('upgrade').title=rangeCost+' crystals';
+ document.getElementById('progress').textContent='💎 '+caveEarned+' / '+caveGoal+' · Cave '+cave;
+ const speedButton=document.getElementById('speed');speedButton.hidden=cave<3;speedButton.textContent='👟 Speed Lv '+speedLevel+' · '+speedCost+'💎';speedButton.disabled=score<speedCost||speedBonus()>=.65;
+}
+document.getElementById('speed').addEventListener('click',()=>{if(cave<3||score<speedCost||speedBonus()>=.65)return;score-=speedCost;speedLevel++;speedCost=Math.ceil(speedCost*1.4+4);sfx('upgrade');showToast('👟 Speed +'+Math.round(speedBonus()*100)+'%!');refreshHud()});
+document.getElementById('power').addEventListener('click',()=>{if(score<powerCost)return;score-=powerCost;spellPower++;const stats=spellStats();sfx('upgrade');showToast('⚡ '+stats.shots+' spells · '+stats.damage+' power');powerCost+=spellPower<=3?3:spellPower<=5?4:6;refreshHud()});
+document.getElementById('upgrade').addEventListener('click',()=>{if(score<rangeCost)return;score-=rangeCost;spellRadius+=18;rangeCost+=spellRadius<=102?3:spellRadius<=156?4:6;sfx('upgrade');showToast('✨ Mining radius upgraded!');refreshHud();});document.getElementById('potion').addEventListener('pointerdown',e=>e.stopPropagation());document.getElementById('potion').addEventListener('click',usePotion);document.getElementById('next').addEventListener('click',()=>{cave++;caveEarned=0;caveGoal=Math.round(100*Math.pow(1.75,cave-1));caveLength=4200+(cave-1)*1300;worldTravel=0;elapsed=0;bolts=[];particles=[];fragments=[];completed=false;held=false;document.getElementById('finish').style.display='none';spawn();refreshHud()});
+function drawPreview(){const p=document.getElementById('preview'),c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);paintGoblin(c,210,230,2.4,true,0)}
+function choiceButtons(id,items,key){const el=document.getElementById(id);el.innerHTML='';items.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.textContent=item.label;b.className=custom[key]===item.value?'active':'';b.addEventListener('click',()=>{custom[key]=item.value;choiceButtons(id,items,key);drawPreview()});el.appendChild(b)})}
+function swatches(id,colors,key){const el=document.getElementById(id);el.innerHTML='';colors.forEach((color,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Option '+(i+1));b.title='Option '+(i+1);b.style.background=Array.isArray(color)?'linear-gradient(to bottom,'+color.map((v,j)=>v+' '+(j*100/color.length)+'% '+((j+1)*100/color.length)+'%').join(',')+')':color;b.className=custom[key]===(key==='bag'?i:color)?'active':'';b.addEventListener('click',()=>{custom[key]=key==='bag'?i:color;swatches(id,colors,key);drawPreview()});el.appendChild(b)})}
+function openCreator(){creatorOpen=true;held=false;document.getElementById('creator').style.display='block';document.getElementById('gn').value=custom.name;drawPreview()}
+choiceButtons('bodyChoices',[{label:'Option 1',value:0},{label:'Option 2',value:1},{label:'Option 3',value:2}],'body');
+choiceButtons('faceChoices',[{label:'🥹',value:'cute'},{label:'😆',value:'laugh'},{label:'😠',value:'angry'}],'face');
+choiceButtons('hairChoices',[{label:'Short',value:'short'},{label:'Medium',value:'medium'},{label:'Long',value:'long'}],'hair');
+swatches('hairChoicesColor',hairColors,'hairColor');swatches('bagChoices',bagColors,'bag');drawPreview();
+const gameMenu=document.getElementById('gameMenu');
+document.getElementById('soundToggle').addEventListener('click',()=>{soundOn=!soundOn;document.getElementById('soundToggle').textContent=soundOn?'🔊 Sound effects: On':'🔇 Sound effects: Off';if(soundOn){wakeAudio();sfx('upgrade')}});
+document.addEventListener('pointerdown',wakeAudio,{passive:true});
+
+function closeGameMenu(){gameMenu.hidden=true;document.getElementById('menuToggle').setAttribute('aria-expanded','false')}
+document.getElementById('menuToggle').addEventListener('click',()=>{gameMenu.hidden=!gameMenu.hidden;document.getElementById('menuToggle').setAttribute('aria-expanded',String(!gameMenu.hidden));held=false});
+document.getElementById('menuClose').addEventListener('click',closeGameMenu);
+document.getElementById('wardrobe').addEventListener('click',()=>{closeGameMenu();openCreator()});
+document.getElementById('startGoblin').addEventListener('click',()=>{custom.name=document.getElementById('gn').value.trim().slice(0,20)||'Dave';paintBagIcon();creatorOpen=false;document.getElementById('creator').style.display='none';document.activeElement.blur();if(!started){started=true;const intro=document.getElementById('intro');intro.textContent=custom.name+' is off to work! ⛏️';intro.style.display='flex';setTimeout(()=>intro.style.display='none',1800)}});
+addEventListener('resize',resize);addEventListener('blur',()=>held=false);document.addEventListener('visibilitychange',()=>{if(document.hidden)held=false});resize();refreshHud();requestAnimationFrame(frame);
+</script></body></html>
