@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 2.7</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 2.8</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
 #creator{position:fixed;inset:0;z-index:30;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;background:linear-gradient(#141b3b,#2d2851);color:#fff;padding:24px 18px calc(180px + env(safe-area-inset-bottom,0px));text-align:center;font-family:system-ui}
 #creator h1{margin:0 0 4px;font-size:25px}#creator p{margin:4px 0 12px;color:#d9d0f3;font-size:13px}
 #preview{width:210px;height:195px;display:block;margin:auto;background:#222c50;border-radius:20px}
@@ -147,57 +147,89 @@ function zoomScale(){return Math.max(.65,1-Math.max(0,cave-2)*.018)}
 function worldToScreen(x,y){const z=zoomScale();return {x:player.x+(x-player.x)*z,y:player.y+(y-player.y)*z}}
 function speedBonus(){let b=0;for(let i=1;i<speedLevel;i++)b+=i<=5?.04:i<=10?.03:.02;return Math.min(.65,b)}
 
-function caveDensity(){return Math.min(5.1,1+(cave-1)*.38)}
+function caveDensity(){return Math.min(5.1,1.35+(cave-1)*.36)}
 function spawn(){
  nodes=[];nodeSerial=0;spawnFront=player.y-40;
  fillAhead();
 }
 function fillAhead(){
- const gap=Math.max(12,34/caveDensity());
- while(spawnFront> player.y-(H*.95)/zoomScale()){
-   nodes.push(makeNode(spawnFront,nodeSerial++));
-   // From cave 3, new crystal-rich side lanes encourage radius upgrades.
-   // All lanes share the same forward path movement to avoid sideways camera drift.
-   if(cave>=3){
-     const extra=cave>=7?3:cave>=4?2:1;
-     for(let j=0;j<extra;j++){
-       const n=makeNode(spawnFront+(j%2)*gap*.36,nodeSerial++);
-       n.rock=Math.random()<(cave>=4?.16:.30);
-       if(!n.rock){n.tier=Math.random()<.12?3:Math.random()<.32?2:1;n.hp=n.tier===3?9:n.tier===2?5:2;n.maxHp=n.hp;n.r=n.tier===3?24:n.tier===2?19:15;n.color=n.tier===3?'#ffb85c':n.tier===2?'#d7a1ff':'#79f4e9';
-         const side=j%2?-1:1;
-         n.x=W/2+side*rand(W*.20,Math.min(W*.41,160));
-       }else{n.tier=0;n.hp=1;n.maxHp=1;n.r=11;n.color='#a2a3b2';n.x=W/2+(j%2?-1:1)*rand(9,30)}
-       nodes.push(n);
-     }
+ const gap=Math.max(15,28/caveDensity());
+ const ahead=player.y-(H*.95)/zoomScale();
+ while(spawnFront>ahead){
+   const y=spawnFront;
+   // The centre stays mineable from cave one, while rich crystal veins
+   // remain visible on both sides as motivation for radius upgrades.
+   nodes.push(makeNode(y,nodeSerial++));
+   const sideDistance=Math.min(W*.40,Math.max(74,W*.25));
+   for(let side of [-1,1]){
+     const n=makeNode(y+rand(-gap*.34,gap*.34),nodeSerial++);
+     n.rock=Math.random()<.08;
+     n.x=W/2+side*rand(sideDistance*.78,sideDistance);
+     if(n.rock){n.tier=0;n.r=13;n.hp=2;n.maxHp=2;n.color='#a2a3b2'}
+     else{n.tier=Math.random()<.10?3:Math.random()<.29?2:1;
+       n.r=n.tier===3?23:n.tier===2?19:15;
+       n.hp=n.tier===3?9:n.tier===2?5:2;n.maxHp=n.hp;
+       n.color=n.tier===3?'#ffb85c':n.tier===2?'#d7a1ff':'#79f4e9'}
+     nodes.push(n);
+   }
+   // Large mystery boulders sit in the wider reaches of the cave.
+   // Some reveal a tiny crystal tip; their purpose is visual anticipation
+   // and they remain mineable by future wider radius / blasts.
+   if(nodeSerial%12===0){
+     const side=Math.random()<.5?-1:1;
+     const big=makeNode(y-gap*.4,nodeSerial++);
+     big.rock=true;big.tier=0;big.r=rand(23,35);big.hp=5;big.maxHp=5;
+     big.x=W/2+side*rand(W*.33,W*.44);
+     big.color='#8e91a9';big.crystalPeek=Math.random()<.42;
+     big.peekColor=['#79f4e9','#d7a1ff','#ffb85c'][Math.floor(Math.random()*3)];
+     nodes.push(big);
    }
    spawnFront-=gap;
  }
 }
 function makeNode(y,i){
- // Easy rocks form the starter mining lane. Crystals are intentionally
- // OUTSIDE the initial 48px spell radius, making radius upgrades meaningful.
- const rockChance=Math.max(.30,.72-(cave-1)*.045);
+ // Starter rocks remain within reach. More distant colourful crystals
+ // are abundant immediately, but require radius upgrades.
+ const rockChance=Math.max(.30,.67-(cave-1)*.035);
  const rock=Math.random()<rockChance;
  const rare=!rock&&Math.random()<Math.min(.22,.045+cave*.013);
  const uncommon=!rock&&!rare&&Math.random()<Math.min(.45,.18+cave*.025);
  const side=i%2?-1:1;
- const halfPath=W*.245;
- // Starter rocks sit within easy mining range. Gems occupy farther lanes.
- // Once players buy radius, the outer crystal deposits become accessible.
- const rockOffset=rand(8,Math.min(halfPath*.38,33));
- const crystalMin=Math.min(halfPath*.88,83);
- const crystalMax=Math.max(crystalMin+2,halfPath*.98);
+ const rockOffset=rand(8,Math.min(W*.095,31));
+ const crystalMin=Math.max(67,Math.min(W*.20,83));
+ const crystalMax=Math.max(crystalMin+5,Math.min(W*.31,118));
  const offset=rock?rockOffset:rand(crystalMin,crystalMax);
  const tier=rock?0:rare?3:uncommon?2:1;
  const hp=rock?1:rare?9:uncommon?5:2;
  return {x:W/2+side*offset,y,hp,maxHp:hp,r:rock?11:rare?24:uncommon?19:15,
  color:rock?'#a2a3b2':rare?'#ffb85c':uncommon?'#d7a1ff':'#79f4e9',tier,rock,alive:true};
 }
+function prepareFirstPotionVein(){
+ // This only happens once, at the first potion discovery.
+ // Ensure at least three crystals inside its 120px blast area,
+ // even if the player has already cleared nearby deposits.
+ const available=nodes.filter(n=>n.alive&&!n.rock&&Math.hypot(n.x-player.x,n.y-player.y)<=120+n.r);
+ const needed=Math.max(0,3-available.length);
+ const spots=[[-67,-42],[72,-28],[-62,48],[64,52],[-82,8],[84,12]];
+ for(let i=0;i<needed;i++){
+   const [dx,dy]=spots[i];
+   const tier=i===1?2:1;
+   nodes.push({x:player.x+dx,y:player.y+dy,hp:tier===2?5:2,maxHp:tier===2?5:2,
+     r:tier===2?19:15,color:tier===2?'#d7a1ff':'#79f4e9',tier,rock:false,alive:true,tutorialVein:true});
+ }
+}
 canvas.addEventListener('pointerdown',e=>{if(creatorOpen||completed||activeDiscovery)return;e.preventDefault();held=true;canvas.setPointerCapture(e.pointerId)});
 function endGesture(){held=false}
 ['pointerup','pointercancel','lostpointercapture'].forEach(t=>canvas.addEventListener(t,endGesture));
 function circle(x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill()}function crystal(n){const {x,y,r,color}=n;
-if(n.rock){ctx.save();ctx.translate(x,y);ctx.fillStyle='#858a9d';ctx.strokeStyle='#c3c5d1';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-r,-r*.1);ctx.lineTo(-r*.65,-r*.75);ctx.lineTo(r*.25,-r);ctx.lineTo(r,r*.1);ctx.lineTo(r*.55,r*.8);ctx.lineTo(-r*.55,r*.7);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();return;}
+if(n.rock){ctx.save();ctx.translate(x,y);ctx.fillStyle='#858a9d';ctx.strokeStyle='#c3c5d1';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-r,-r*.1);ctx.lineTo(-r*.65,-r*.75);ctx.lineTo(r*.25,-r);ctx.lineTo(r,r*.1);ctx.lineTo(r*.55,r*.8);ctx.lineTo(-r*.55,r*.7);ctx.closePath();ctx.fill();ctx.stroke();
+ if(n.crystalPeek){
+   ctx.save();ctx.translate(r*.12,-r*.48);
+   ctx.shadowColor=n.peekColor;ctx.shadowBlur=9;
+   ctx.fillStyle=n.peekColor;ctx.strokeStyle='#f6e9ff';ctx.lineWidth=1;
+   ctx.beginPath();ctx.moveTo(-r*.13,0);ctx.lineTo(-r*.1,-r*.43);ctx.lineTo(r*.06,-r*.7);ctx.lineTo(r*.22,-r*.34);ctx.lineTo(r*.17,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+ }
+ ctx.restore();return;}
 ctx.save();ctx.translate(x,y);ctx.shadowColor=color;ctx.shadowBlur=17;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(r*.8,-r*.35);ctx.lineTo(r*.55,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.shadowBlur=0;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(0,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle='#ffffff55';ctx.fill();ctx.strokeStyle='#f9efff';ctx.lineWidth=1.5;ctx.stroke();ctx.restore()}function drawScene(t){let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0c1530');bg.addColorStop(.6,'#203357');bg.addColorStop(1,'#31425b');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);for(let side of [-1,1]){ctx.fillStyle=side<0?'#172846':'#1a2c4c';ctx.beginPath();ctx.moveTo(side<0?0:W,0);ctx.lineTo(W/2+side*W*.19,H*.13);ctx.lineTo(W/2+side*W*.46,H);ctx.lineTo(side<0?0:W,H);ctx.fill()}ctx.beginPath();ctx.moveTo(W*.24,H*.10);ctx.lineTo(W*.76,H*.10);ctx.lineTo(W*.96,H);ctx.lineTo(W*.04,H);ctx.closePath();let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#364767');g.addColorStop(1,'#66748c');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#91a3c344';ctx.lineWidth=3;ctx.stroke();for(let i=0;i<40;i++){let x=(i*137.3)%W,y=(i*83.7)%H;circle(x,y,1.2+Math.sin(t*.001+i)*.8,['#85f8fa88','#f5a3f388','#ffe0a688'][i%3])}ctx.save();ctx.translate(player.x,player.y);ctx.scale(zoomScale(),zoomScale());ctx.translate(-player.x,-player.y);for(let n of nodes)if(n.alive)crystal(n);ctx.restore()}function radiusRing(t){ctx.save();ctx.beginPath();ctx.ellipse(player.x,player.y+8,spellRadius*zoomScale(),spellRadius*.48*zoomScale(),0,0,Math.PI*2);ctx.strokeStyle='#b3faff77';ctx.lineWidth=2;ctx.setLineDash([7,7]);ctx.lineDashOffset=-t*.018;ctx.shadowColor='#7df9fa';ctx.shadowBlur=10;ctx.stroke();ctx.setLineDash([]);ctx.restore()}function paintGoblin(c,x,y,scale=1,front=false,t=0,walking=false){
  c.save();c.translate(x,y);c.scale(scale,scale);
  // A playful side-to-side waddle, with a gentle bouncing shuffle.
@@ -378,11 +410,19 @@ function tone(freq=620,duration=.09,volume=.028,type='sine',slide=1){
  if(!soundOn||!audioCtx||audioCtx.state!=='running')return;
  try{const t=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(Math.max(70,freq*slide),t+duration);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration+.01)}catch(e){}
 }
-function sfx(kind){const t=performance.now();if(kind==='hit'){if(t-lastTink<110)return;lastTink=t;tone(370+rand(0,100),.075,.016,'triangle',.72)}
+function sfx(kind,tier=1){const t=performance.now();if(kind==='hit'){if(t-lastTink<110)return;lastTink=t;tone(370+rand(0,100),.075,.016,'triangle',.72)}
  else if(kind==='break'){tone(410+rand(0,150),.13,.028,'triangle',.5)}
  else if(kind==='crumble'){if(t-lastCrumble<110)return;lastCrumble=t; tone(160+rand(0,70),.09,.017,'triangle',.55);tone(90+rand(0,45),.14,.012,'sawtooth',.65)}
  else if(kind==='potionFound'){tone(540,.12,.022,'sine',1.4);tone(810,.24,.026,'sine',1.32);tone(1080,.35,.013,'triangle',1.1)}
  else if(kind==='collect'){if(t-lastPlink<72)return;lastPlink=t;tone(740+rand(0,220),.115,.026,'sine',1.35)}
+ else if(kind==='crystalTinkle'){
+   // Separate from the existing collection plink. Higher tiers sound more enchanted.
+   
+   const base=tier>=3?1046:tier===2?880:740;
+   tone(base+rand(-25,25),.17,.018,'sine',1.27);
+   if(tier>=2)tone(base*1.5,.25,.012,'sine',1.15);
+   if(tier>=3)tone(base*2,.35,.009,'triangle',1.1);
+ }
  else if(kind==='upgrade'){tone(570,.19,.037,'sine',1.5);tone(850,.24,.018,'sine',1.25)}
  else if(kind==='potion'){tone(190,.27,.065,'triangle',.52)}
  else if(kind==='blast'){tone(140,.28,.07,'sawtooth',.42);tone(270,.18,.045,'triangle',.28);tone(580,.24,.025,'sine',1.55)}
@@ -393,16 +433,20 @@ function shatter(n,reward){
  const pieces=Math.min(9,Math.max(4,4+reward));
  for(let i=0;i<pieces;i++){
   const a=(Math.PI*2*i/pieces)+rand(-.35,.35),speed=rand(.075,.20);
-  fragments.push({x:n.x,y:n.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,age:0,scatter:rand(220,350),groundWait:rand(130,260),duration:rand(800,1120),groundY:n.y+rand(12,23),landed:false,size:rand(2.5,5.5),color:n.rock?'#bdc5d9':n.color,reward:i<reward?1:0});
+  fragments.push({x:n.x,y:n.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,age:0,scatter:rand(220,350),groundWait:rand(130,260),duration:rand(800,1120),groundY:n.y+rand(12,23),landed:false,size:rand(2.5,5.5),color:n.rock?'#bdc5d9':n.color,crystalTier:n.rock?0:n.tier,reward:i<reward?1:0});
  }
  sfx('break');if(n.tier>=3)sfx('rare');
 }
 function mineNode(n,bonus=0,source='spell'){if(!n.alive)return 0;n.alive=false;const reward=n.rock?(Math.random()<.4?1:0)+bonus:n.tier+bonus;
  earnXP(n);if(source==='companion'&&companion)companionGems+=reward;
  shatter(n,reward);
- if(!n.rock){const drop=Math.random();if(drop<.004){startCompanion('dragon')}else if(drop<.018){startCompanion('fairy')}else if(drop<.053){greenPotions++;sfx('potionFound');if(!seenFirstPotion){seenFirstPotion=true;queueDiscovery({kind:'potion'})}else showToast('🧪 Green potion found!')}}refreshHud();return reward;}
+ if(!n.rock){const drop=Math.random();if(drop<.004){startCompanion('dragon')}else if(drop<.018){startCompanion('fairy')}else if(drop<.053){greenPotions++;sfx('potionFound');if(!seenFirstPotion){seenFirstPotion=true;prepareFirstPotionVein();queueDiscovery({kind:'potion'})}else showToast('🧪 Green potion found!')}}refreshHud();return reward;}
 function usePotion(){
  if(!greenPotions||completed||activeDiscovery||recordOpen)return;
+ if(seenFirstPotion&&!records.potion){
+   const near=nodes.some(n=>n.alive&&!n.rock&&Math.hypot(n.x-player.x,n.y-player.y)<=120+n.r);
+   if(!near)prepareFirstPotionVein();
+ }
  greenPotions--;sfx('blast');const radius=120;
  blastEffects.push({x:player.x,y:player.y,r:radius,life:650});
  let hits=0,crystals=0;
@@ -437,7 +481,7 @@ function update(dt,t){if(creatorOpen||activeDiscovery||recordOpen||!document.get
      const pull=.014+.13*progress;
      f.x+=(player.x-f.x)*Math.min(.9,pull*dt/16*3);
      f.y+=(player.y+13-f.y)*Math.min(.9,pull*dt/16*3);
-     if(progress>=1||Math.hypot(f.x-player.x,f.y-(player.y+13))<9){f.done=true;award(f.reward);if(f.reward)sfx('collect')}
+     if(progress>=1||Math.hypot(f.x-player.x,f.y-(player.y+13))<9){f.done=true;award(f.reward);if(f.reward){sfx('collect');if(f.crystalTier>0)sfx('crystalTinkle',f.crystalTier)}}
    }
  }
  fragments=fragments.filter(f=>!f.done);
