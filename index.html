@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 3.0</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 3.1</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
 #creator{position:fixed;inset:0;z-index:30;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;background:linear-gradient(#141b3b,#2d2851);color:#fff;padding:24px 18px calc(180px + env(safe-area-inset-bottom,0px));text-align:center;font-family:system-ui}
 #creator h1{margin:0 0 4px;font-size:25px}#creator p{margin:4px 0 12px;color:#d9d0f3;font-size:13px}
 #preview{width:210px;height:195px;display:block;margin:auto;background:#222c50;border-radius:20px}
@@ -95,7 +95,21 @@
 <style>
 #recordToast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 43px);left:50%;transform:translate(-50%,-9px);opacity:0;pointer-events:none;z-index:24;max-width:80vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#34245de8;color:#ffe7a6;border:1px solid #c9a5f1;border-radius:15px;padding:7px 13px;font:800 13px system-ui,sans-serif;text-shadow:0 0 8px #a17aff;transition:opacity .3s,transform .3s}
 #recordToast.show{opacity:1;transform:translate(-50%,0)}
-</style></head><body><button id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button><div id="gameMenu" hidden><div class="menuHeading">⚙️ Menu</div><button id="wardrobe" type="button">🧌 Edit goblin</button><button id="soundToggle" type="button">🔊 Sound effects: On</button><div class="menuNote">Gentle sounds • no background music yet</div><button id="menuClose" type="button">Close</button></div><div id="intro"></div><div id="creator"><h1>✨ Create your goblin ✨</h1><p>Every little miner deserves a look of their own</p><canvas id="preview" width="420" height="390"></canvas><div class="creatorGroup">Body<div class="choices" id="bodyChoices"></div></div><div class="creatorGroup">Expression<div class="choices" id="faceChoices"></div></div><div class="creatorGroup">Hair length<div class="choices" id="hairChoices"></div></div><div class="creatorGroup">Hair colour<div class="swatches" id="hairChoicesColor"></div></div><div class="creatorGroup">Bag design<div class="swatches" id="bagChoices"></div></div><div class="creatorGroup">Name your goblin<input id="gn" maxlength="20" placeholder="Dave" value="Dave" autocomplete="off"/></div><button id="startGoblin">⛏️ Off to work!</button></div><canvas id="game"></canvas><div class="hud"><div class="pill" id="count"><canvas id="bagIcon" width="32" height="36" aria-hidden="true"></canvas><span aria-hidden="true">💎</span><span id="bagCount">0</span></div></div><button id="upgrade" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 300px);background:#342b63;color:white;border:1px solid #bda8f5;border-radius:20px;padding:10px;font-weight:750;z-index:2">✨ Radius Level Up · 5💎</button><button id="power" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 245px);background:#4d315d;color:white;border:1px solid #f4b7ed;border-radius:20px;padding:10px;font-weight:750;z-index:2">⚡ Spell Power Up · 4💎</button><button id="speed" type="button" hidden>👟 Speed Up · 12💎</button><div id="progress" style="position:fixed;top:calc(env(safe-area-inset-top,12px) + 66px);left:12px;color:#f9edff;background:#1b2147dd;border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;pointer-events:none">💎 0 / 100 · Cave 2</div><button id="potion" aria-label="Use green blast potion" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 225px);min-width:64px;min-height:66px;z-index:3;background:#183f3ae8;border:2px solid #77e9a6;border-radius:18px;color:white;font-size:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:manipulation"><span>🧪</span><span id="potioncount" style="font-size:13px;font-weight:800">× 0</span></button><div id="toast" style="position:fixed;top:39%;left:50%;transform:translateX(-50%);color:#d2ffe0;font-weight:800;text-shadow:0 2px 6px #142d22;pointer-events:none;z-index:4"></div><div id="finish" style="display:none;position:fixed;inset:0;background:#10152ddc;z-index:5;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;gap:18px;padding:24px"><div style="font-size:32px;font-weight:850">✨ Cave complete! ✨</div><div id="finishtext">You collected enough crystals!</div><button id="next" style="background:#7055b2;color:white;border:1px solid #dfcaff;border-radius:24px;padding:15px 26px;font-size:18px;font-weight:750">Enter next cave →</button></div><div class="title">✦ CRYSTAL CAVERN v3.0 ✦</div><button id="helpToggle" type="button" aria-label="How to play" title="How to play">?</button><div id="helpBanner" role="dialog" aria-label="How to play" hidden><div class="helpTitle">✧ Welcome to Crystal Cavern ✧</div><p>👆 Hold to explore</p><p>✨ Your goblin mines automatically</p><p>💎 Collect crystals and reach the cave goal</p><button id="helpDismiss" type="button">Let's explore! ✨</button></div><div id="recordToast" role="status" aria-live="polite"></div><div id="xpHud" aria-label="Experience"><div id="xpLabel"><span id="xpLevel">⭐ Lv 1</span><span id="xpText">0 / 100 XP</span></div><div id="xpTrack"><div id="xpFill"></div></div></div><div id="xpFlyLayer" aria-hidden="true"></div><button id="recordsButton" type="button" aria-label="Magical records" title="Magical records">🏆</button><div id="recordsOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="recordsHeading"><div id="recordsCard"><canvas id="recordsPortrait" width="250" height="260" aria-label="Your goblin portrait"></canvas><h2 id="recordsHeading">✨ Magical Records ✨</h2><p id="recordsMessage"></p><div id="recordsGrid"></div><button id="recordsClose" type="button">Got It ✨</button></div></div><div id="discoveryOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="discoveryHeading"><div id="discoveryCard"><canvas id="discoveryPortrait" width="340" height="348" aria-label="Your customised goblin"></canvas><h2 id="discoveryHeading"></h2><p id="discoveryMessage"></p><button id="discoveryAction" type="button">Got It ✨</button></div></div><script>
+</style><style>
+/* v3.1: accessible, compact crafting/audio sheets */
+#craftOverlay[hidden],#audioOverlay[hidden],#coachArrow[hidden]{display:none!important}
+#craftOverlay,#audioOverlay{position:fixed;inset:0;z-index:95;background:#10132de5;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)}
+.alchemyCard{width:min(410px,100%);max-height:87dvh;overflow-y:auto;background:linear-gradient(155deg,#49336d,#22234c);border:2px solid #d2b1f6;border-radius:24px;padding:17px;color:#fff4ff;box-shadow:0 0 35px #8b5cda55;text-align:center}
+.alchemyCard h2{font:700 26px Georgia,serif;margin:4px 0 7px;color:#ffe1ff}.alchemySub{font-size:13px;color:#ddcdea;margin:0 0 12px}
+.craftRow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;text-align:left;border:1px solid #a68ad1;background:#1e214a9c;border-radius:15px;padding:10px;margin:8px 0}
+.craftRow strong{display:block;font-size:16px}.craftRow small{display:block;color:#d6c8e9;line-height:1.35;font-size:12px;margin-top:3px}
+.craftRow button,.alchemyClose,.audioActions button{border:1px solid #ebd5ff;border-radius:12px;background:#bd9be5;color:#251a43;font-weight:800;padding:10px 11px;min-height:42px}
+.craftRow button:disabled{opacity:.45}.alchemyClose{width:100%;margin-top:10px;background:#e5b9f8}
+#audioRows{text-align:left}.audioRow{padding:7px 0}.audioRow label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}.audioRow input{width:100%;accent-color:#d5a8fa;min-height:25px}.audioActions{display:flex;gap:9px}.audioActions button{flex:1}
+#coachArrow{position:fixed;z-index:55;max-width:220px;pointer-events:none;padding:9px 12px;border-radius:13px;border:1px solid #f5d9ff;background:#33245ce8;color:#ffe7ff;font:700 13px Georgia,serif;text-align:center;box-shadow:0 0 18px #c489fa88;animation:coachBob .9s ease-in-out infinite alternate}
+@keyframes coachBob{to{transform:translateY(-7px)}}
+#potion{font-family:Georgia,serif!important}
+</style></head><body><button id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button><div id="gameMenu" hidden><div class="menuHeading">⚙️ Menu</div><button id="wardrobe" type="button">🧌 Edit goblin</button><button id="audioOpen" type="button">🔊 Audio settings</button><div class="menuNote">Separate volume controls • saved on this device</div><button id="menuClose" type="button">Close</button></div><div id="intro"></div><div id="creator"><h1>✨ Create your goblin ✨</h1><p>Every little miner deserves a look of their own</p><canvas id="preview" width="420" height="390"></canvas><div class="creatorGroup">Body<div class="choices" id="bodyChoices"></div></div><div class="creatorGroup">Expression<div class="choices" id="faceChoices"></div></div><div class="creatorGroup">Hair length<div class="choices" id="hairChoices"></div></div><div class="creatorGroup">Hair colour<div class="swatches" id="hairChoicesColor"></div></div><div class="creatorGroup">Bag design<div class="swatches" id="bagChoices"></div></div><div class="creatorGroup">Name your goblin<input id="gn" maxlength="20" placeholder="Dave" value="Dave" autocomplete="off"/></div><button id="startGoblin">⛏️ Off to work!</button></div><canvas id="game"></canvas><div class="hud"><div class="pill" id="count"><canvas id="bagIcon" width="32" height="36" aria-hidden="true"></canvas><span aria-hidden="true">💎</span><span id="bagCount">0</span></div></div><button id="upgrade" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 300px);background:#342b63;color:white;border:1px solid #bda8f5;border-radius:20px;padding:10px;font-weight:750;z-index:2">✨ Radius Level Up · 5💎</button><button id="power" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 245px);background:#4d315d;color:white;border:1px solid #f4b7ed;border-radius:20px;padding:10px;font-weight:750;z-index:2">⚡ Spell Power Up · 4💎</button><button id="speed" type="button" hidden>👟 Speed Up · 12💎</button><div id="progress" style="position:fixed;top:calc(env(safe-area-inset-top,12px) + 66px);left:12px;color:#f9edff;background:#1b2147dd;border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;pointer-events:none">💎 0 / 100 · Cave 2</div><button id="potion" aria-label="Open potion crafting" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 225px);min-width:64px;min-height:66px;z-index:3;background:#183f3ae8;border:2px solid #77e9a6;border-radius:18px;color:white;font-size:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:manipulation"><span>🧪</span><span id="potioncount" style="font-size:13px;font-weight:800">× 0</span></button><div id="coachArrow" hidden role="status"></div><div id="craftOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="craftTitle"><div class="alchemyCard"><h2 id="craftTitle">🧪 Goblin Alchemy</h2><p class="alchemySub">Mix little potions into magnificent magic!</p><div id="craftRows"></div><button id="craftClose" class="alchemyClose" type="button">Back to the cave ✨</button></div></div><div id="audioOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="audioTitle"><div class="alchemyCard"><h2 id="audioTitle">🔊 Audio Settings</h2><div id="audioRows"></div><div class="audioActions"><button id="muteAll" type="button">🔇 Mute All</button><button id="audioReset" type="button">Reset defaults</button></div><button id="audioClose" class="alchemyClose" type="button">Done ✨</button></div></div><div id="toast" style="position:fixed;top:39%;left:50%;transform:translateX(-50%);color:#d2ffe0;font-weight:800;text-shadow:0 2px 6px #142d22;pointer-events:none;z-index:4"></div><div id="finish" style="display:none;position:fixed;inset:0;background:#10152ddc;z-index:5;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;gap:18px;padding:24px"><div style="font-size:32px;font-weight:850">✨ Cave complete! ✨</div><div id="finishtext">You collected enough crystals!</div><button id="next" style="background:#7055b2;color:white;border:1px solid #dfcaff;border-radius:24px;padding:15px 26px;font-size:18px;font-weight:750">Enter next cave →</button></div><div class="title">✦ CRYSTAL CAVERN v3.1 ✦</div><button id="helpToggle" type="button" aria-label="How to play" title="How to play">?</button><div id="helpBanner" role="dialog" aria-label="How to play" hidden><div class="helpTitle">✧ Welcome to Crystal Cavern ✧</div><p>👆 Hold to explore</p><p>✨ Your goblin mines automatically</p><p>💎 Collect crystals and reach the cave goal</p><button id="helpDismiss" type="button">Let's explore! ✨</button></div><div id="recordToast" role="status" aria-live="polite"></div><div id="xpHud" aria-label="Experience"><div id="xpLabel"><span id="xpLevel">⭐ Lv 1</span><span id="xpText">0 / 100 XP</span></div><div id="xpTrack"><div id="xpFill"></div></div></div><div id="xpFlyLayer" aria-hidden="true"></div><button id="recordsButton" type="button" aria-label="Magical records" title="Magical records">🏆</button><div id="recordsOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="recordsHeading"><div id="recordsCard"><canvas id="recordsPortrait" width="250" height="260" aria-label="Your goblin portrait"></canvas><h2 id="recordsHeading">✨ Magical Records ✨</h2><p id="recordsMessage"></p><div id="recordsGrid"></div><button id="recordsClose" type="button">Got It ✨</button></div></div><div id="discoveryOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="discoveryHeading"><div id="discoveryCard"><canvas id="discoveryPortrait" width="340" height="348" aria-label="Your customised goblin"></canvas><h2 id="discoveryHeading"></h2><p id="discoveryMessage"></p><button id="discoveryAction" type="button">Got It ✨</button></div></div><script>
 const custom={body:1,face:'cute',hair:'medium',hairColor:'#f58cc8',bag:9,name:'Dave'};
 const hairColors=['#49332f','#a66b43','#e9c879','#f0e6d7','#242332','#f58cc8','#a66de4','#53bd79','#54a9e9','#e85a58'];
 const bagColors=[['#e64d55'],['#f59e3d'],['#f4d35e'],['#4cbf8b'],['#438de5'],['#a777d4'],['#e88fb8'],['#202b42'],['#f3e8cf'],['#e94e4e','#f4a640','#f5e35e','#4ebf75','#498fe0','#985fc4'],['#d52d00','#f18f56','#fff','#d66ca5','#a30262'],['#d60270','#a14d9b','#0038a8'],['#5bcefa','#f5a9b8','#fff','#f5a9b8','#5bcefa'],['#fcf434','#fff','#9c59d1','#2c2c2c'],['#000','#a3a3a3','#fff','#800080']];
@@ -106,7 +120,7 @@ let blastSequence=0,pendingBlast=null;
 function finishBlastIfCollected(){
  if(!pendingBlast||pendingBlast.remaining>0)return;
  const result=pendingBlast;pendingBlast=null;
- if(result.collected>0)queueRecord('potion',result.collected);
+ if(result.collected>0)queueRecord(result.recordType||'potion',result.collected);
 }
 
 let records={potion:0,dragon:0,fairy:0,tome:0};
@@ -139,23 +153,23 @@ function showRecords(event=null){
  const modal=document.getElementById('recordsOverlay');modal.hidden=false;
  const c=document.getElementById('recordsPortrait'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);paintGoblin(g,125,148,1.45,true,0);
  const name=custom.name||'Your goblin';
- document.getElementById('recordsHeading').textContent=event?'🏆 NEW '+(event.type==='potion'?'BLAST':'HELPER')+' RECORD!':'✨ Magical Records ✨';
+ document.getElementById('recordsHeading').textContent=event?'🏆 NEW '+(event.type==='potion'||event.type==='tome'?'BLAST':'HELPER')+' RECORD!':'✨ Magical Records ✨';
  document.getElementById('recordsMessage').textContent=event
- ?(event.type==='potion'?name+' blasted '+event.amount+' crystals with a potion!':(event.type==='dragon'?'Baby dragon':'Fairy')+' helped '+name+' get '+event.amount+' crystals!')
+ ?(event.type==='potion'?name+' blasted '+event.amount+' crystals with a potion!':event.type==='tome'?name+' unleashed a tome and gathered '+event.amount+' crystals!':(event.type==='dragon'?'Baby dragon':'Fairy')+' helped '+name+' get '+event.amount+' crystals!')
  :name+"’s personal bests";
  const data=[['🧪 Potion Blast',records.potion],['🐉 Baby Dragon',records.dragon],['🧚 Fairy',records.fairy],['📖 Tome Blast',records.tome]];
- document.getElementById('recordsGrid').innerHTML=data.map(([label,val],i)=>'<div class="recordCell">'+label+'<b>'+(i===3&&val===0?'Coming later':val+' 💎')+'</b></div>').join('');
+ document.getElementById('recordsGrid').innerHTML=data.map(([label,val],i)=>'<div class="recordCell">'+label+'<b>'+(val===0?'—':val+' 💎')+'</b></div>').join('');
 }
 function queueRecord(type,amount){
  if(amount<=records[type]||amount<=0)return;
  records[type]=amount;
  if(celebratedRecords[type]){saveRecords();recordToast(type,amount);return;}
- celebratedRecords[type]=true;saveRecords();recordQueue.push({type,amount});
+ celebratedRecords[type]=true;saveRecords();sfx('upgrade');recordQueue.push({type,amount});
  maybeShowRecord();
 }
 function maybeShowRecord(){if(recordOpen||activeDiscovery||!document.getElementById('discoveryOverlay').hidden||!recordQueue.length||creatorOpen||completed)return;showRecords(recordQueue.shift())}
 document.getElementById('recordsButton').addEventListener('click',()=>{if(!creatorOpen&&!activeDiscovery)showRecords()});
-document.getElementById('recordsClose').addEventListener('click',()=>{recordOpen=false;document.getElementById('recordsOverlay').hidden=true;maybeShowRecord()});
+document.getElementById('recordsClose').addEventListener('click',()=>{recordOpen=false;document.getElementById('recordsOverlay').hidden=true;if(!firstRecordsHelp){firstRecordsHelp=true;showCoach('🏆 ↑ Your records live here!', 'recordsButton')}maybeShowRecord()});
 function xpValue(n){return n.rock?1:n.tier>=5?15:n.tier>=3?8:n.tier===2?4:2}
 function earnXP(n){
  const amount=xpValue(n);xpTotal+=amount;xpInLevel+=amount;
@@ -173,10 +187,43 @@ function earnXP(n){
 }
 
 
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');let W,H,dpr,now=0,last=0,elapsed=0,score=0;const player={x:0,y:0},target={x:0,y:0};let held=false,looking=false,gesture=null,camX=0,camY=0,particles=[],fragments=[],bolts=[],nodes=[],distance=0,spellRadius=48,spellPower=1,powerCost=4,rangeCost=5,stepPulse=0,cave=1,caveEarned=0,caveGoal=100,caveLength=4200,completed=false,worldTravel=0,greenPotions=0,companion=null,companionRemaining=0,blastEffects=[],toastTimer=0;const rand=(a,b)=>a+Math.random()*(b-a);function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);player.x=W/2;player.y=H*.53;target.x=player.x;target.y=player.y;spawn()}let nodeSerial=0,spawnFront=0,speedLevel=1,speedCost=12;
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');let W,H,dpr,now=0,last=0,elapsed=0,score=0;const player={x:0,y:0},target={x:0,y:0};let held=false,looking=false,gesture=null,camX=0,camY=0,particles=[],fragments=[],bolts=[],nodes=[],distance=0,spellRadius=48,spellPower=1,powerCost=4,rangeCost=5,stepPulse=0,cave=1,caveEarned=0,caveGoal=100,caveLength=4200,completed=false,worldTravel=0,greenPotions=0,pinkPotions=0,goldPotions=0,tomes=0,companion=null,companionRemaining=0,blastEffects=[],toastTimer=0;const rand=(a,b)=>a+Math.random()*(b-a);function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);player.x=W/2;player.y=H*.53;target.x=player.x;target.y=player.y;spawn()}let nodeSerial=0,spawnFront=0,speedLevel=1,speedCost=12;
+let firstPotionHelp=false,firstRecordsHelp=false,craftOpen=false,audioOpen=false;
 function zoomScale(){return Math.max(.65,1-Math.max(0,cave-2)*.018)}
-function worldToScreen(x,y){const z=zoomScale();return {x:player.x+(x-player.x)*z,y:player.y+(y-player.y)*z}}
-function speedBonus(){let b=0;for(let i=1;i<speedLevel;i++)b+=i<=5?.04:i<=10?.03:.02;return Math.min(.65,b)}
+function depthScale(y){const distance=(player.y-y)/Math.max(H,1);return Math.max(.36,Math.min(1.28,1.07-distance*.72))}
+function worldToScreen(x,y){const z=zoomScale(),depth=depthScale(y);return {x:player.x+(x-player.x)*z*depth,y:player.y+(y-player.y)*z*depth}}
+
+const recipeInfo={green:{label:'🟢 Green potion',radius:70,damage:2},pink:{label:'🩷 Pink potion',radius:125,damage:5},gold:{label:'🟡 Gold potion',radius:210,damage:12},tome:{label:'📖 Tome of Destruction',radius:350,damage:999}};
+function potionCount(type){return type==='green'?greenPotions:type==='pink'?pinkPotions:type==='gold'?goldPotions:tomes}
+function setPotionCount(type,v){if(type==='green')greenPotions=v;else if(type==='pink')pinkPotions=v;else if(type==='gold')goldPotions=v;else tomes=v}
+function showCoach(message,id){const target=document.getElementById(id),el=document.getElementById('coachArrow');if(!target)return;const r=target.getBoundingClientRect();el.textContent=message;el.hidden=false;el.style.top=Math.min(innerHeight-65,r.bottom+10)+'px';el.style.left=Math.max(8,Math.min(innerWidth-225,r.left+r.width/2-95))+'px';clearTimeout(showCoach.timer);showCoach.timer=setTimeout(()=>el.hidden=true,3900)}
+function openCraft(){if(creatorOpen||activeDiscovery||recordOpen||completed)return;craftOpen=true;held=false;document.getElementById('craftOverlay').hidden=false;renderCraft()}
+function closeCraft(){craftOpen=false;document.getElementById('craftOverlay').hidden=true}
+function renderCraft(){
+ const recipes=[['green','🟢 Green potion','Small blast • 70px'],['pink','🩷 Pink potion','125px • stronger magic'],['gold','🟡 Gold potion','210px • powerful blast'],['tome','📖 Tome of Destruction','350px • massive blast']];
+ const rows=document.getElementById('craftRows');rows.replaceChildren();
+ for(const [type,label,desc] of recipes){
+  const row=document.createElement('div');row.className='craftRow';const info=document.createElement('div');
+  const title=document.createElement('strong');title.textContent=label+' × '+potionCount(type);
+  const detail=document.createElement('small');detail.textContent=desc;info.append(title,detail);
+  if(type!=='green'){const ingredients=type==='pink'?'4 green → 1 pink':type==='gold'?'3 pink → 1 gold':'5 gold → 1 tome';const cost=document.createElement('small');cost.textContent=ingredients;info.append(cost)}
+  const buttons=document.createElement('div');buttons.style.display='flex';buttons.style.flexDirection='column';buttons.style.gap='5px';
+  if(type!=='green'){const input=type==='pink'?'green':type==='gold'?'pink':'gold',cost=type==='pink'?4:type==='gold'?3:5;
+   const craft=document.createElement('button');craft.textContent='Craft';craft.disabled=potionCount(input)<cost;craft.onclick=()=>{if(potionCount(input)<cost)return;setPotionCount(input,potionCount(input)-cost);setPotionCount(type,potionCount(type)+1);sfx('upgrade');refreshHud();renderCraft()};buttons.append(craft)}
+  const use=document.createElement('button');use.textContent='Use';use.disabled=potionCount(type)<1;use.onclick=()=>{closeCraft();usePotion(type)};buttons.append(use);row.append(info,buttons);rows.append(row)
+ }
+}
+const audioDefaults={music:35,crystals:65,mining:50,potions:75,companions:60,achievements:70};
+let audioVolumes={...audioDefaults},currentAudioCategory='mining',audioMuted=false,musicClock=0,musicIndex=0;
+try{const saved=JSON.parse(localStorage.getItem('crystalCavernAudioV31')||'null');if(saved){for(const key of Object.keys(audioDefaults))if(Number.isFinite(saved[key]))audioVolumes[key]=Math.max(0,Math.min(100,saved[key]));audioMuted=Boolean(saved.muted)}}catch(e){}
+function saveAudio(){try{localStorage.setItem('crystalCavernAudioV31',JSON.stringify({...audioVolumes,muted:audioMuted}))}catch(e){}}
+function audioCategory(kind){return kind==='collect'||kind==='crystalTinkle'||kind==='rare'?'crystals':kind==='blast'||kind==='potion'||kind==='potionFound'?'potions':kind==='upgrade'?'achievements':'mining'}
+function openAudio(){audioOpen=true;held=false;closeGameMenu();document.getElementById('audioOverlay').hidden=false;renderAudio()}
+function renderAudio(){const rows=document.getElementById('audioRows');rows.replaceChildren();const labels={music:'🎵 Background music',crystals:'💎 Crystal chimes',mining:'🪨 Mining & crumbling',potions:'🧪 Potions & explosions',companions:'🧚 Companion sounds',achievements:'🏆 Achievements'};
+ for(const [key,labelText] of Object.entries(labels)){const row=document.createElement('div');row.className='audioRow';const label=document.createElement('label');const text=document.createElement('span');text.textContent=labelText;const value=document.createElement('span');value.textContent=audioVolumes[key]+'%';label.append(text,value);const input=document.createElement('input');input.type='range';input.min=0;input.max=100;input.step=5;input.value=audioVolumes[key];input.setAttribute('aria-label',labelText);input.oninput=()=>{audioVolumes[key]=Number(input.value);value.textContent=input.value+'%';saveAudio()};row.append(label,input);rows.append(row)}
+ document.getElementById('muteAll').textContent=audioMuted?'🔊 Unmute All':'🔇 Mute All';}
+function musicTick(dt){if(audioMuted||!soundOn||audioVolumes.music===0||!started||creatorOpen||craftOpen||audioOpen||activeDiscovery||recordOpen)return;musicClock-=dt;if(musicClock>0)return;musicClock=1100;const notes=[261.63,329.63,392,523.25,440,392,329.63,293.66];currentAudioCategory='music';tone(notes[musicIndex++%notes.length],.8,.018,'sine',1);}
+function speedBonus(){let b=0;for(let i=1;i<speedLevel;i++)b+=i<=5?.065:i<=10?.05:.035;return Math.min(1.2,b)}
 
 function caveDensity(){return Math.min(6.4,2.35+(cave-1)*.36)}
 function spawn(){
@@ -252,9 +299,9 @@ function prepareFirstPotionVein(){
  // This only happens once, at the first potion discovery.
  // Ensure at least three crystals inside its 120px blast area,
  // even if the player has already cleared nearby deposits.
- const available=nodes.filter(n=>n.alive&&!n.rock&&Math.hypot(n.x-player.x,n.y-player.y)<=Math.max(120,spellRadius*1.55)+n.r);
+ const available=nodes.filter(n=>n.alive&&!n.rock&&n.hp<=recipeInfo.green.damage&&Math.hypot(n.x-player.x,n.y-player.y)<=70+n.r);
  const needed=Math.max(0,3-available.length);
- const spots=[[-67,-42],[72,-28],[-62,48],[64,52],[-82,8],[84,12]];
+ const spots=[[-31,-26],[34,-24],[-29,31],[32,28],[-40,7],[39,8]];
  for(let i=0;i<needed;i++){
    const [dx,dy]=spots[i];
    const tier=i===1?2:1;
@@ -262,7 +309,7 @@ function prepareFirstPotionVein(){
      r:tier===2?19:15,color:tier===2?'#d7a1ff':'#79f4e9',tier,rock:false,alive:true,tutorialVein:true});
  }
 }
-canvas.addEventListener('pointerdown',e=>{if(creatorOpen||completed||activeDiscovery)return;e.preventDefault();held=true;canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointerdown',e=>{if(creatorOpen||completed||activeDiscovery||recordOpen||craftOpen||audioOpen)return;e.preventDefault();held=true;canvas.setPointerCapture(e.pointerId)});
 function endGesture(){held=false}
 ['pointerup','pointercancel','lostpointercapture'].forEach(t=>canvas.addEventListener(t,endGesture));
 function circle(x,y,r,c){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill()}function crystal(n){const {x,y,r,color}=n;
@@ -274,7 +321,7 @@ if(n.rock){ctx.save();ctx.translate(x,y);ctx.fillStyle='#858a9d';ctx.strokeStyle
    ctx.beginPath();ctx.moveTo(-r*.13,0);ctx.lineTo(-r*.1,-r*.43);ctx.lineTo(r*.06,-r*.7);ctx.lineTo(r*.22,-r*.34);ctx.lineTo(r*.17,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
  }
  ctx.restore();return;}
-ctx.save();ctx.translate(x,y);ctx.shadowColor=color;ctx.shadowBlur=17;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(r*.8,-r*.35);ctx.lineTo(r*.55,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.shadowBlur=0;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(0,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle='#ffffff55';ctx.fill();ctx.strokeStyle='#f9efff';ctx.lineWidth=1.5;ctx.stroke();ctx.restore()}function drawScene(t){let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0c1530');bg.addColorStop(.6,'#203357');bg.addColorStop(1,'#31425b');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);for(let side of [-1,1]){ctx.fillStyle=side<0?'#172846':'#1a2c4c';ctx.beginPath();ctx.moveTo(side<0?0:W,0);ctx.lineTo(W/2+side*W*.19,H*.13);ctx.lineTo(W/2+side*W*.46,H);ctx.lineTo(side<0?0:W,H);ctx.fill()}ctx.beginPath();ctx.moveTo(W*.24,H*.10);ctx.lineTo(W*.76,H*.10);ctx.lineTo(W*.96,H);ctx.lineTo(W*.04,H);ctx.closePath();let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#364767');g.addColorStop(1,'#66748c');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#91a3c344';ctx.lineWidth=3;ctx.stroke();for(let i=0;i<40;i++){let x=(i*137.3)%W,y=(i*83.7)%H;circle(x,y,1.2+Math.sin(t*.001+i)*.8,['#85f8fa88','#f5a3f388','#ffe0a688'][i%3])}ctx.save();ctx.translate(player.x,player.y);ctx.scale(zoomScale(),zoomScale());ctx.translate(-player.x,-player.y);for(let n of nodes)if(n.alive)crystal(n);ctx.restore()}function radiusRing(t){ctx.save();ctx.beginPath();ctx.ellipse(player.x,player.y+8,spellRadius*zoomScale(),spellRadius*.48*zoomScale(),0,0,Math.PI*2);ctx.strokeStyle='#b3faff77';ctx.lineWidth=2;ctx.setLineDash([7,7]);ctx.lineDashOffset=-t*.018;ctx.shadowColor='#7df9fa';ctx.shadowBlur=10;ctx.stroke();ctx.setLineDash([]);ctx.restore()}function paintGoblin(c,x,y,scale=1,front=false,t=0,walking=false){
+ctx.save();ctx.translate(x,y);ctx.shadowColor=color;ctx.shadowBlur=17;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(r*.8,-r*.35);ctx.lineTo(r*.55,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.shadowBlur=0;ctx.beginPath();ctx.moveTo(0,-r*1.4);ctx.lineTo(0,r);ctx.lineTo(-r*.65,r);ctx.lineTo(-r*.85,-r*.25);ctx.closePath();ctx.fillStyle='#ffffff55';ctx.fill();ctx.strokeStyle='#f9efff';ctx.lineWidth=1.5;ctx.stroke();ctx.restore()}function drawScene(t){let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0c1530');bg.addColorStop(.6,'#203357');bg.addColorStop(1,'#31425b');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);for(let side of [-1,1]){ctx.fillStyle=side<0?'#172846':'#1a2c4c';ctx.beginPath();ctx.moveTo(side<0?0:W,0);ctx.lineTo(W/2+side*W*.19,H*.13);ctx.lineTo(W/2+side*W*.46,H);ctx.lineTo(side<0?0:W,H);ctx.fill()}ctx.beginPath();ctx.moveTo(W*.24,H*.10);ctx.lineTo(W*.76,H*.10);ctx.lineTo(W*.96,H);ctx.lineTo(W*.04,H);ctx.closePath();let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#364767');g.addColorStop(1,'#66748c');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#91a3c344';ctx.lineWidth=3;ctx.stroke();for(let i=0;i<40;i++){let x=(i*137.3)%W,y=(i*83.7)%H;circle(x,y,1.2+Math.sin(t*.001+i)*.8,['#85f8fa88','#f5a3f388','#ffe0a688'][i%3])}for(const n of nodes){if(!n.alive)continue;const q=worldToScreen(n.x,n.y),sz=zoomScale()*depthScale(n.y);ctx.save();ctx.translate(q.x,q.y);ctx.scale(sz,sz);crystal({...n,x:0,y:0});ctx.restore()}}function radiusRing(t){ctx.save();ctx.beginPath();ctx.ellipse(player.x,player.y+8,spellRadius*zoomScale(),spellRadius*.48*zoomScale(),0,0,Math.PI*2);ctx.strokeStyle='#b3faff77';ctx.lineWidth=2;ctx.setLineDash([7,7]);ctx.lineDashOffset=-t*.018;ctx.shadowColor='#7df9fa';ctx.shadowBlur=10;ctx.stroke();ctx.setLineDash([]);ctx.restore()}function paintGoblin(c,x,y,scale=1,front=false,t=0,walking=false){
  c.save();c.translate(x,y);c.scale(scale,scale);
  // A playful side-to-side waddle, with a gentle bouncing shuffle.
  if(walking){c.translate(Math.sin(walkCycle)*4,-Math.abs(Math.sin(walkCycle*1.15))*3);c.rotate(Math.sin(walkCycle)*.095)}
@@ -409,7 +456,8 @@ document.getElementById('discoveryAction').addEventListener('click',()=>{
    // The first potion is used as part of the tutorial, not merely dismissed.
    activeDiscovery=null;
    document.getElementById('discoveryOverlay').hidden=true;
-   usePotion();
+   usePotion('green');
+   if(!firstPotionHelp){firstPotionHelp=true;setTimeout(()=>showCoach('🧪 ↑ Your potions & crafting are here!', 'potion'),1200)}
    if(!activeDiscovery)openNextDiscovery();maybeShowRecord();
  }else{
    const type=activeDiscovery.type;
@@ -421,7 +469,7 @@ document.getElementById('discoveryAction').addEventListener('click',()=>{
 });
 function castVolley(){
  const stats=spellStats();
- const extra=companion==='fairy'?1:companion==='dragon'?2:0;
+ const extra=companion?Math.max(1,Math.ceil(stats.shots*.2)):0;
  const available=nodes.filter(n=>n.alive&&Math.hypot(n.x-player.x,n.y-player.y)<=spellRadius+n.r)
    .sort((a,b)=>(a.rock?0:1)-(b.rock?0:1)||Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y)||b.tier-a.tier);
  if(!available.length)return;
@@ -432,7 +480,7 @@ function castVolley(){
   const originX=helper?player.x+(companion==='dragon'?30:-30):player.x;
   const originY=helper?player.y-55:player.y-20;
   bolts.push({x:originX,y:originY,tx:n.x,ty:n.y,node:n,p:0,
-   helper,damage:helper?(companion==='dragon'?2:1):stats.damage,
+   helper,damage:helper?Math.max(1,Math.ceil(stats.damage*.2)):stats.damage,
    color:helper?(companion==='dragon'?'#ffb96b':'#c8ffbd'):'#9cfbff'});
  }
 }
@@ -451,10 +499,11 @@ function drawCompanion(t){
 let audioCtx=null,soundOn=true,lastTink=0,lastPlink=0,lastCrumble=0,lastCrystalChime=0,companionMusicClock=0;
 function wakeAudio(){if(!soundOn)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){audioCtx=null}}
 function tone(freq=620,duration=.09,volume=.028,type='sine',slide=1){
- if(!soundOn||!audioCtx||audioCtx.state!=='running')return;
+ if(!soundOn||audioMuted||!audioCtx||audioCtx.state!=='running')return;
+ volume*=((audioVolumes[currentAudioCategory]??50)/100);if(volume<=0)return;
  try{const t=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(Math.max(70,freq*slide),t+duration);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration+.01)}catch(e){}
 }
-function sfx(kind,tier=1){const t=performance.now();if(kind==='hit'){if(t-lastTink<110)return;lastTink=t;tone(370+rand(0,100),.075,.016,'triangle',.72)}
+function sfx(kind,tier=1){currentAudioCategory=audioCategory(kind);const t=performance.now();if(kind==='hit'){if(t-lastTink<110)return;lastTink=t;tone(370+rand(0,100),.075,.016,'triangle',.72)}
  else if(kind==='break'){tone(410+rand(0,150),.13,.028,'triangle',.5)}
  else if(kind==='crumble'){if(t-lastCrumble<110)return;lastCrumble=t; tone(160+rand(0,70),.09,.017,'triangle',.55);tone(90+rand(0,45),.14,.012,'sawtooth',.65)}
  else if(kind==='potionFound'){tone(540,.12,.022,'sine',1.4);tone(810,.24,.026,'sine',1.32);tone(1080,.35,.013,'triangle',1.1)}
@@ -492,34 +541,34 @@ function shatter(n,reward,blastId=null){
 function mineNode(n,bonus=0,source='spell',blastId=null){if(!n.alive)return 0;n.alive=false;const reward=n.rock?(Math.random()<.4?1:0)+bonus:n.tier+bonus;
  earnXP(n);if(source==='companion'&&companion)companionGems+=reward;
  shatter(n,reward,blastId);
- if(!n.rock){const drop=Math.random();if(drop<.004){startCompanion('dragon')}else if(drop<.018){startCompanion('fairy')}else if(drop<.053){greenPotions++;sfx('potionFound');if(!seenFirstPotion){seenFirstPotion=true;prepareFirstPotionVein();queueDiscovery({kind:'potion'})}else showToast('🧪 Green potion found!')}}refreshHud();return reward;}
-function usePotion(){
- if(!greenPotions||completed||activeDiscovery||recordOpen)return;
- if(seenFirstPotion&&!records.potion){
-   const near=nodes.some(n=>n.alive&&!n.rock&&Math.hypot(n.x-player.x,n.y-player.y)<=Math.max(120,spellRadius*1.55)+n.r);
+ if(!n.rock){const drop=Math.random();if(drop<.004){startCompanion('dragon')}else if(drop<.018){startCompanion('fairy')}else if(drop<.043){greenPotions++;sfx('potionFound');if(!seenFirstPotion){seenFirstPotion=true;prepareFirstPotionVein();queueDiscovery({kind:'potion'})}else showToast('🧪 Green potion found!')}}refreshHud();return reward;}
+function usePotion(type='green'){
+ if(potionCount(type)<1||completed||activeDiscovery||recordOpen||craftOpen||pendingBlast)return;
+ const recipe=recipeInfo[type];
+ if(type==='green'&&seenFirstPotion&&!records.potion){
+   const near=nodes.some(n=>n.alive&&!n.rock&&n.hp<=recipe.damage&&Math.hypot(n.x-player.x,n.y-player.y)<=recipe.radius+n.r);
    if(!near)prepareFirstPotionVein();
  }
- greenPotions--;sfx('blast');
- // A genuinely circular 360-degree blast, centred on the goblin.
- // Potion reach grows as the player upgrades their spell radius.
- const radius=Math.max(120,spellRadius*1.55);
- blastEffects.push({x:player.x,y:player.y,r:radius,life:650});
+ setPotionCount(type,potionCount(type)-1);sfx('blast');
+ const radius=recipe.radius;
+ blastEffects.push({x:player.x,y:player.y,r:radius,life:650,color:type==='green'?'135,255,143':type==='pink'?'255,137,223':type==='gold'?'255,219,109':'203,144,255'});
  let hits=0,crystals=0;
  const blastId=++blastSequence;
- pendingBlast={id:blastId,remaining:0,collected:0};
- // The achievement waits until every blast crystal has entered the bag.
+ pendingBlast={id:blastId,remaining:0,collected:0,recordType:type==='tome'?'tome':'potion'};
  for(const n of [...nodes]){
   if(n.alive&&Math.hypot(n.x-player.x,n.y-player.y)<=radius+n.r){
-   for(let i=0;i<8;i++)particles.push({x:n.x,y:n.y,vx:rand(-.2,.2),vy:rand(-.2,.1),life:rand(350,700),color:'#9dff8b'});
-   const reward=mineNode(n,1,'potion',blastId);
-   if(!n.rock){crystals+=reward;pendingBlast.remaining+=reward;}
-   hits++;if(completed)break;
+   for(let i=0;i<8;i++)particles.push({x:n.x,y:n.y,vx:rand(-.2,.2),vy:rand(-.2,.1),life:rand(350,700),color:n.color});
+   // Strength determines what it can crack, not just how many gems it rewards.
+   if(n.hp>recipe.damage) {n.hp-=recipe.damage;sfx('hit');continue}
+   const reward=mineNode(n,0,'potion',blastId);
+   if(!n.rock){crystals+=reward;pendingBlast.remaining+=reward}
+   hits++;
   }
  }
- showToast(hits?'💥 '+crystals+' crystals blasted!':'💥 No crystals in range');
+ showToast(hits?'💥 '+crystals+' crystals blasted!':'💥 Blast weakened nearby rocks!');
  finishBlastIfCollected();refreshHud();
 }
-function update(dt,t){if(creatorOpen||activeDiscovery||recordOpen||!document.getElementById('discoveryOverlay').hidden)return;camX=0;camY=0;if(completed&&fragments.length===0)return;stepPulse=Math.max(0,stepPulse-dt*.005);toastTimer=Math.max(0,toastTimer-dt);if(!toastTimer)document.getElementById('toast').classList.remove('visible');blastEffects=blastEffects.filter(b=>(b.life-=dt)>0);if(companionRemaining>0){companionMusicClock-=dt;if(companionMusicClock<=0){companionMusicClock+=companion==='fairy'?780:950;if(companion==='fairy'){tone(820,.22,.012,'sine',1.28);tone(1230,.28,.008,'sine',.92)}else{tone(185,.43,.015,'triangle',.82);tone(277,.39,.011,'sine',1.13)}}companionRemaining=Math.max(0,companionRemaining-dt);if(companionRemaining===0){const ended=companion;companion=null;queueRecord(ended,companionGems);companionGems=0;refreshHud()}}if(held&&!completed){walkCycle+=dt*.016;stepPulse=Math.min(1,stepPulse+dt*.012);let step=dt*.065*(1+speedBonus());distance+=step;worldTravel+=step;for(let n of nodes)n.y+=step;
+function update(dt,t){if(creatorOpen||activeDiscovery||recordOpen||craftOpen||audioOpen||!document.getElementById('discoveryOverlay').hidden)return;camX=0;camY=0;if(completed&&fragments.length===0)return;stepPulse=Math.max(0,stepPulse-dt*.005);toastTimer=Math.max(0,toastTimer-dt);if(!toastTimer)document.getElementById('toast').classList.remove('visible');blastEffects=blastEffects.filter(b=>(b.life-=dt)>0);musicTick(dt);if(companionRemaining>0){companionMusicClock-=dt;if(companionMusicClock<=0){companionMusicClock+=companion==='fairy'?780:950;if(companion==='fairy'){currentAudioCategory='companions';tone(820,.22,.012,'sine',1.28);tone(1230,.28,.008,'sine',.92)}else{currentAudioCategory='companions';tone(185,.43,.015,'triangle',.82);tone(277,.39,.011,'sine',1.13)}}companionRemaining=Math.max(0,companionRemaining-dt);if(companionRemaining===0){const ended=companion;companion=null;queueRecord(ended,companionGems);companionGems=0;refreshHud()}}if(held&&!completed){walkCycle+=dt*.016;stepPulse=Math.min(1,stepPulse+dt*.012);let step=dt*.078*(1+speedBonus());distance+=step;worldTravel+=step;for(let n of nodes)n.y+=step;
  spawnFront+=step;fillAhead();
  // Cleared or passed nodes never return: exploration is the source of new loot.
  nodes=nodes.filter(n=>n.y<player.y+(H*.7+80)/zoomScale());}elapsed+=dt;if(elapsed>=2000){elapsed-=2000;castVolley()}for(let b of bolts){b.p+=dt/260;if(b.p>=1&&!b.done){b.done=true;if(b.node.alive){b.node.hp=Math.max(0,b.node.hp-b.damage);sfx('hit');for(let i=0;i<5;i++)particles.push({x:b.node.x,y:b.node.y,vx:rand(-.13,.13),vy:rand(-.2,.04),life:rand(400,750),color:b.node.color});if(b.node.hp<=0){mineNode(b.node,0,b.helper?'companion':'spell')}}}}bolts=bolts.filter(b=>!b.done);for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);
@@ -551,7 +600,7 @@ function update(dt,t){if(creatorOpen||activeDiscovery||recordOpen||!document.get
  fragments=fragments.filter(f=>!f.done);
  finishBlastIfCollected();
 }function frame(t){let dt=Math.min(t-last||16,50);last=t;update(dt,t);drawScene(t);for(let b of bolts){ctx.strokeStyle=b.color;ctx.shadowColor=b.color;ctx.shadowBlur=15;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(b.x,b.y);const end=worldToScreen(b.tx,b.ty);ctx.lineTo(b.x+(end.x-b.x)*b.p,b.y+(end.y-b.y)*b.p);ctx.stroke();ctx.shadowBlur=0}for(let p of particles){const q=worldToScreen(p.x,p.y);circle(q.x,q.y,3*zoomScale(),p.color)}for(const f of fragments){const q=worldToScreen(f.x,f.y);ctx.save();ctx.translate(q.x,q.y);ctx.rotate(f.age*.006);ctx.shadowColor=f.color;ctx.shadowBlur=6;ctx.fillStyle=f.color;const z=zoomScale();ctx.beginPath();ctx.moveTo(0,-f.size*z);ctx.lineTo(f.size*.8*z,0);ctx.lineTo(0,f.size*z);ctx.lineTo(-f.size*.8*z,0);ctx.closePath();ctx.fill();ctx.restore()}
- for(const b of blastEffects){ctx.save();ctx.beginPath();ctx.arc(b.x,b.y,b.r*zoomScale()*(1-b.life/650),0,Math.PI*2);ctx.strokeStyle='rgba(135,255,143,'+(b.life/650)+')';ctx.lineWidth=7;ctx.shadowColor='#8dff92';ctx.shadowBlur=24;ctx.stroke();ctx.restore()}radiusRing(t);goblin(t);drawCompanion(t);requestAnimationFrame(frame)}function paintBagIcon(){
+ for(const b of blastEffects){ctx.save();ctx.beginPath();ctx.arc(b.x,b.y,b.r*zoomScale()*(1-b.life/650),0,Math.PI*2);ctx.strokeStyle='rgba('+(b.color||'135,255,143')+','+(b.life/650)+')';ctx.lineWidth=7;ctx.shadowColor='#8dff92';ctx.shadowBlur=24;ctx.stroke();ctx.restore()}radiusRing(t);goblin(t);drawCompanion(t);requestAnimationFrame(frame)}function paintBagIcon(){
  const c=document.getElementById('bagIcon'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
  const colors=bagColors[custom.bag]||bagColors[0];
  g.save();g.beginPath();g.moveTo(8,8);g.quadraticCurveTo(16,4,24,8);g.quadraticCurveTo(31,18,27,29);g.quadraticCurveTo(16,35,5,29);g.quadraticCurveTo(1,18,8,8);g.closePath();g.clip();
@@ -563,16 +612,16 @@ function refreshHud(){
  paintBagIcon();
  document.getElementById('power').textContent='⚡ Spell Power Up · '+powerCost+'💎';
  document.getElementById('upgrade').textContent='✨ Radius Level Up · '+rangeCost+'💎';
- document.getElementById('potioncount').textContent='× '+greenPotions;
- document.getElementById('potion').style.opacity=greenPotions?'1':'.55';
+ document.getElementById('potioncount').textContent='× '+(greenPotions+pinkPotions+goldPotions+tomes);
+ document.getElementById('potion').style.opacity=(greenPotions+pinkPotions+goldPotions+tomes)?'1':'.75';
  document.getElementById('power').title=powerCost+' crystals';
  document.getElementById('upgrade').title=rangeCost+' crystals';
  document.getElementById('progress').textContent='💎 '+caveEarned+' / '+caveGoal+' · Cave '+cave;
- const speedButton=document.getElementById('speed');speedButton.hidden=cave<3;speedButton.textContent='👟 Speed Lv '+speedLevel+' · '+speedCost+'💎';speedButton.disabled=score<speedCost||speedBonus()>=.65;
+ const speedButton=document.getElementById('speed');speedButton.hidden=cave<3;speedButton.textContent='👟 Speed Lv '+speedLevel+' · '+speedCost+'💎';speedButton.disabled=score<speedCost||speedBonus()>=1.2;
 }
-document.getElementById('speed').addEventListener('click',()=>{if(cave<3||score<speedCost||speedBonus()>=.65)return;score-=speedCost;speedLevel++;speedCost=Math.ceil(speedCost*1.4+4);sfx('upgrade');showToast('👟 Speed +'+Math.round(speedBonus()*100)+'%!');refreshHud()});
+document.getElementById('speed').addEventListener('click',()=>{if(cave<3||score<speedCost||speedBonus()>=1.2)return;score-=speedCost;speedLevel++;speedCost=Math.ceil(speedCost*1.4+4);sfx('upgrade');showToast('👟 Speed +'+Math.round(speedBonus()*100)+'%!');refreshHud()});
 document.getElementById('power').addEventListener('click',()=>{if(score<powerCost)return;score-=powerCost;spellPower++;const stats=spellStats();sfx('upgrade');showToast('⚡ '+stats.shots+' spells · '+stats.damage+' power');powerCost+=spellPower<=3?3:spellPower<=5?4:6;refreshHud()});
-document.getElementById('upgrade').addEventListener('click',()=>{if(score<rangeCost)return;score-=rangeCost;spellRadius+=18;rangeCost+=spellRadius<=102?3:spellRadius<=156?4:6;sfx('upgrade');showToast('✨ Mining radius upgraded!');refreshHud();});document.getElementById('potion').addEventListener('pointerdown',e=>e.stopPropagation());document.getElementById('potion').addEventListener('click',usePotion);document.getElementById('next').addEventListener('click',()=>{cave++;caveEarned=0;caveGoal=Math.round(100*Math.pow(1.75,cave-1));caveLength=4200+(cave-1)*1300;worldTravel=0;elapsed=0;bolts=[];particles=[];fragments=[];completed=false;held=false;document.getElementById('finish').style.display='none';spawn();refreshHud();maybeShowRecord()});
+document.getElementById('upgrade').addEventListener('click',()=>{if(score<rangeCost)return;score-=rangeCost;spellRadius+=18;rangeCost+=spellRadius<=102?3:spellRadius<=156?4:6;sfx('upgrade');showToast('✨ Mining radius upgraded!');refreshHud();});document.getElementById('potion').addEventListener('pointerdown',e=>e.stopPropagation());document.getElementById('potion').addEventListener('click',openCraft);document.getElementById('next').addEventListener('click',()=>{cave++;caveEarned=0;caveGoal=Math.round(100*Math.pow(1.75,cave-1));caveLength=4200+(cave-1)*1300;worldTravel=0;elapsed=0;bolts=[];particles=[];fragments=[];completed=false;held=false;document.getElementById('finish').style.display='none';spawn();refreshHud();maybeShowRecord()});
 function drawPreview(){const p=document.getElementById('preview'),c=p.getContext('2d');c.clearRect(0,0,p.width,p.height);paintGoblin(c,210,230,2.4,true,0)}
 function choiceButtons(id,items,key){const el=document.getElementById(id);el.innerHTML='';items.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.textContent=item.label;b.className=custom[key]===item.value?'active':'';b.addEventListener('click',()=>{custom[key]=item.value;choiceButtons(id,items,key);drawPreview()});el.appendChild(b)})}
 function swatches(id,colors,key){const el=document.getElementById(id);el.innerHTML='';colors.forEach((color,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Option '+(i+1));b.title='Option '+(i+1);b.style.background=Array.isArray(color)?'linear-gradient(to bottom,'+color.map((v,j)=>v+' '+(j*100/color.length)+'% '+((j+1)*100/color.length)+'%').join(',')+')':color;b.className=custom[key]===(key==='bag'?i:color)?'active':'';b.addEventListener('click',()=>{custom[key]=key==='bag'?i:color;swatches(id,colors,key);drawPreview()});el.appendChild(b)})}
@@ -582,7 +631,12 @@ choiceButtons('faceChoices',[{label:'🥹',value:'cute'},{label:'😆',value:'la
 choiceButtons('hairChoices',[{label:'Short',value:'short'},{label:'Medium',value:'medium'},{label:'Long',value:'long'}],'hair');
 swatches('hairChoicesColor',hairColors,'hairColor');swatches('bagChoices',bagColors,'bag');drawPreview();
 const gameMenu=document.getElementById('gameMenu');
-document.getElementById('soundToggle').addEventListener('click',()=>{soundOn=!soundOn;document.getElementById('soundToggle').textContent=soundOn?'🔊 Sound effects: On':'🔇 Sound effects: Off';if(soundOn){wakeAudio();sfx('upgrade')}});
+document.getElementById('audioOpen').addEventListener('click',openAudio);
+document.getElementById('audioClose').addEventListener('click',()=>{audioOpen=false;document.getElementById('audioOverlay').hidden=true});
+document.getElementById('audioReset').addEventListener('click',()=>{audioVolumes={...audioDefaults};audioMuted=false;saveAudio();renderAudio()});
+document.getElementById('muteAll').addEventListener('click',()=>{audioMuted=!audioMuted;saveAudio();renderAudio()});
+document.getElementById('craftClose').addEventListener('click',closeCraft);
+
 document.addEventListener('pointerdown',wakeAudio,{passive:true});
 
 function closeGameMenu(){gameMenu.hidden=true;document.getElementById('menuToggle').setAttribute('aria-expanded','false')}
