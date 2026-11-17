@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 2.1</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Crystal Cavern — Prototype 2.3</title><style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}#game,button,.hud,.hint,.title,#progress{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}#game{overscroll-behavior:none}.hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#1b2147dd;border:1px solid #9d8ad366;border-radius:22px;color:#fff;padding:9px 13px;font-weight:750;box-shadow:0 4px 18px #080c2277}.hint{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%);background:#151a38c9;color:#e6dcff;padding:10px 16px;border-radius:20px;white-space:nowrap;font-size:13px;pointer-events:none}.title{position:fixed;top:calc(env(safe-area-inset-top,0px) + 65px);left:0;right:0;text-align:center;color:#f5d9ff;font-weight:850;letter-spacing:2px;text-shadow:0 2px 10px #a354e5;pointer-events:none;font-size:14px}
 #creator{position:fixed;inset:0;z-index:30;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;background:linear-gradient(#141b3b,#2d2851);color:#fff;padding:24px 18px calc(180px + env(safe-area-inset-bottom,0px));text-align:center;font-family:system-ui}
 #creator h1{margin:0 0 4px;font-size:25px}#creator p{margin:4px 0 12px;color:#d9d0f3;font-size:13px}
 #preview{width:210px;height:195px;display:block;margin:auto;background:#222c50;border-radius:20px}
@@ -11,59 +11,36 @@
 #intro{position:fixed;inset:0;background:#171d3eea;color:white;z-index:29;display:none;align-items:center;justify-content:center;text-align:center;font-size:27px;font-weight:850;padding:24px}
 
 
-/* v1.9: minimal mobile HUD and tucked-away menu */
-.hud{top:auto!important;right:auto!important;left:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 285px)!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;z-index:3!important}
-.hud .pill{font-size:13px!important;padding:7px 10px!important;white-space:nowrap!important}
-#count{display:flex;align-items:center;gap:6px;min-height:38px;font-size:17px!important}
+/* Crystal Cavern v2.3 — single, consistent mobile interface layout */
+#count{display:flex;align-items:center;gap:7px;min-height:42px;font-size:16px}
 #bagIcon{width:25px;height:29px;display:block;flex:none}
-#menuToggle{position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 355px);z-index:7;border:1px solid #bda8f5;background:#342b63;color:#fff;border-radius:16px;width:48px;height:45px;font-size:25px;font-weight:700}
-#gameMenu{position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 410px);z-index:8;background:#28234c;color:#fff;border:1px solid #bda8f5;border-radius:18px;padding:14px;box-shadow:0 8px 32px #080c22aa;width:min(245px,calc(100vw - 24px));font-weight:700}
+.hud{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 158px)!important;left:12px!important;right:auto!important;bottom:auto!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;z-index:12!important;pointer-events:none!important}
+.hud .pill{font-size:14px!important;padding:7px 10px!important;white-space:nowrap}
+#menuToggle{position:fixed;top:calc(env(safe-area-inset-top,0px) + 99px)!important;left:12px;bottom:auto!important;z-index:17;border:1px solid #bda8f5;background:#342b63;color:white;border-radius:16px;width:48px;height:48px;font-size:25px;font-weight:700}
+#gameMenu{position:fixed;top:calc(env(safe-area-inset-top,0px) + 153px)!important;left:12px;bottom:auto!important;z-index:18;background:#28234c;color:#fff;border:1px solid #bda8f5;border-radius:18px;padding:14px;box-shadow:0 8px 32px #080c22aa;width:min(245px,calc(100vw - 24px));font-weight:700}
 #gameMenu[hidden]{display:none!important}
 #gameMenu button{display:block;width:100%;margin-top:10px;background:#443766;border:1px solid #9682c7;color:#fff;border-radius:12px;padding:11px;text-align:left;font-weight:700}
 #gameMenu .menuHeading{font-size:17px}
 #gameMenu .menuNote{font-size:12px;color:#c6b9df;font-weight:500;margin-top:12px}
+#progress{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 213px)!important;left:12px!important;right:auto!important;bottom:auto!important;z-index:12!important;max-width:min(54vw,320px)!important;font-size:12px!important;line-height:1.3!important}
+#upgrade,#power,#speed{position:fixed!important;right:12px!important;bottom:auto!important;z-index:14!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;max-width:51vw!important;min-height:43px!important;font-size:12px!important;padding:9px 10px!important}
+#upgrade{top:calc(env(safe-area-inset-top,0px) + 158px)!important}
+#power{top:calc(env(safe-area-inset-top,0px) + 210px)!important}
+#speed{top:calc(env(safe-area-inset-top,0px) + 262px)!important;background:#244d5c;color:white;border:1px solid #8fe3e7;border-radius:20px;font-weight:750}
+#speed[hidden]{display:none!important}#speed:disabled{opacity:.6!important}
+#potion{right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 66px)!important;z-index:14!important}
+.title{display:none}
 #toast{top:50%!important;transform:translate(-50%,-50%)!important;text-align:center;max-width:75vw;padding:12px 18px;background:#232044df;border:1px solid #bca9e8;border-radius:16px;box-shadow:0 8px 24px #080c2255;font-size:16px;opacity:0;transition:opacity .25s ease}
 #toast.visible{opacity:1}
-#progress{top:auto!important;left:12px!important;right:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 209px)!important;max-width:min(65vw,320px)!important;font-size:12px!important;line-height:1.3!important;z-index:3!important}
-@media(max-width:390px){#progress{max-width:62vw!important;font-size:11px!important}.hud .pill{font-size:12px!important}}
-#speed{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 60px);background:#244d5c;color:#fff;border:1px solid #8fe3e7;border-radius:20px;padding:10px;font-weight:750;z-index:2;max-width:55vw}#speed[hidden]{display:none!important}#speed:disabled{opacity:.6}
-
-/* v2.0.1 comfort layout: top controls, no HUD over the walking area */
-.hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;bottom:auto!important;left:12px!important;right:auto!important}
-#progress{top:calc(env(safe-area-inset-top,0px) + 65px)!important;bottom:auto!important;left:12px!important;max-width:48vw!important}
-#menuToggle{top:calc(env(safe-area-inset-top,0px) + 110px)!important;bottom:auto!important}
-#gameMenu{top:calc(env(safe-area-inset-top,0px) + 165px)!important;bottom:auto!important}
-#upgrade,#power,#speed{right:12px!important;bottom:auto!important;max-width:53vw!important;font-size:12px!important;padding:9px 10px!important;min-height:39px!important}
-#upgrade{top:calc(env(safe-area-inset-top,0px) + 12px)!important}
-#power{top:calc(env(safe-area-inset-top,0px) + 59px)!important}
-#speed{top:calc(env(safe-area-inset-top,0px) + 106px)!important}
-#potion{right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 66px)!important}
-.title{display:none}
-@media(max-width:390px){#upgrade,#power,#speed{font-size:11px!important;padding:8px!important}}
-/* v2.0.2: reserve a reliable tap-safe header on mobile browsers. */
-:root{--hud-top:max(62px, calc(env(safe-area-inset-top,0px) + 18px))}
-.hud{top:var(--hud-top)!important;z-index:12!important}
-#progress{top:calc(var(--hud-top) + 51px)!important;z-index:12!important}
-#menuToggle{top:calc(var(--hud-top) + 95px)!important;z-index:15!important;left:12px!important;min-width:48px;min-height:48px}
-#gameMenu{top:calc(var(--hud-top) + 148px)!important;z-index:16!important}
-#upgrade,#power,#speed{z-index:14!important;right:12px!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;max-width:55vw!important}
-#upgrade{top:var(--hud-top)!important}
-#power{top:calc(var(--hud-top) + 49px)!important}
-#speed{top:calc(var(--hud-top) + 98px)!important}
-#speed[hidden]{display:none!important}
-#potion{z-index:14!important}
-/* v2.1: Safari's top toolbar can cover the top of the visual viewport.
-   Keep ALL controls well inside the visible play area, independent of env(safe-area). */
-:root{--hud-top:155px}
-.hud{top:var(--hud-top)!important}
-#progress{top:calc(var(--hud-top) + 52px)!important}
-#menuToggle{top:calc(var(--hud-top) + 100px)!important}
-#gameMenu{top:calc(var(--hud-top) + 156px)!important}
-#upgrade{top:var(--hud-top)!important}
-#power{top:calc(var(--hud-top) + 49px)!important}
-#speed{top:calc(var(--hud-top) + 98px)!important}
-#upgrade,#power,#speed{min-height:43px!important;max-width:51vw!important}
-@media(max-height:650px){:root{--hud-top:105px}}
+@media(max-width:390px){#upgrade,#power,#speed{font-size:11px!important;padding:8px!important}#progress{max-width:50vw!important;font-size:11px!important}}
+@media(max-height:650px){
+ #menuToggle{top:calc(env(safe-area-inset-top,0px) + 60px)!important}
+ .hud,#upgrade{top:calc(env(safe-area-inset-top,0px) + 119px)!important}
+ #progress{top:calc(env(safe-area-inset-top,0px) + 174px)!important}
+ #power{top:calc(env(safe-area-inset-top,0px) + 171px)!important}
+ #speed{top:calc(env(safe-area-inset-top,0px) + 223px)!important}
+ #gameMenu{top:calc(env(safe-area-inset-top,0px) + 114px)!important}
+}
 </style></head><body><button id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button><div id="gameMenu" hidden><div class="menuHeading">⚙️ Menu</div><button id="wardrobe" type="button">🧌 Edit goblin</button><button id="soundToggle" type="button">🔊 Sound effects: On</button><div class="menuNote">Gentle sounds • no background music yet</div><button id="menuClose" type="button">Close</button></div><div id="intro"></div><div id="creator"><h1>✨ Create your goblin ✨</h1><p>Every little miner deserves a look of their own</p><canvas id="preview" width="420" height="390"></canvas><div class="creatorGroup">Body<div class="choices" id="bodyChoices"></div></div><div class="creatorGroup">Expression<div class="choices" id="faceChoices"></div></div><div class="creatorGroup">Hair length<div class="choices" id="hairChoices"></div></div><div class="creatorGroup">Hair colour<div class="swatches" id="hairChoicesColor"></div></div><div class="creatorGroup">Bag design<div class="swatches" id="bagChoices"></div></div><div class="creatorGroup">Name your goblin<input id="gn" maxlength="20" placeholder="Dave" value="Dave" autocomplete="off"/></div><button id="startGoblin">⛏️ Off to work!</button></div><canvas id="game"></canvas><div class="hud"><div class="pill" id="count"><canvas id="bagIcon" width="32" height="36" aria-hidden="true"></canvas><span aria-hidden="true">💎</span><span id="bagCount">0</span></div></div><button id="upgrade" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 300px);background:#342b63;color:white;border:1px solid #bda8f5;border-radius:20px;padding:10px;font-weight:750;z-index:2">✨ Radius Level Up · 5💎</button><button id="power" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 245px);background:#4d315d;color:white;border:1px solid #f4b7ed;border-radius:20px;padding:10px;font-weight:750;z-index:2">⚡ Spell Power Up · 4💎</button><button id="speed" type="button" hidden>👟 Speed Up · 12💎</button><div id="progress" style="position:fixed;top:calc(env(safe-area-inset-top,12px) + 66px);left:12px;color:#f9edff;background:#1b2147dd;border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;pointer-events:none">💎 0 / 100 · Cave 2</div><button id="potion" aria-label="Use green blast potion" style="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 225px);min-width:64px;min-height:66px;z-index:3;background:#183f3ae8;border:2px solid #77e9a6;border-radius:18px;color:white;font-size:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;touch-action:manipulation"><span>🧪</span><span id="potioncount" style="font-size:13px;font-weight:800">× 0</span></button><div id="toast" style="position:fixed;top:39%;left:50%;transform:translateX(-50%);color:#d2ffe0;font-weight:800;text-shadow:0 2px 6px #142d22;pointer-events:none;z-index:4"></div><div id="finish" style="display:none;position:fixed;inset:0;background:#10152ddc;z-index:5;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;gap:18px;padding:24px"><div style="font-size:32px;font-weight:850">✨ Cave complete! ✨</div><div id="finishtext">You collected enough crystals!</div><button id="next" style="background:#7055b2;color:white;border:1px solid #dfcaff;border-radius:24px;padding:15px 26px;font-size:18px;font-weight:750">Enter next cave →</button></div><div class="title">✦ CRYSTAL CAVERN v2.1.1 ✦</div><div class="hint">👆 Hold to explore • ✨ Auto-mine • 💎 Reach the cave goal</div><script>
 const custom={body:1,face:'cute',hair:'medium',hairColor:'#f58cc8',bag:9,name:'Dave'};
 const hairColors=['#49332f','#a66b43','#e9c879','#f0e6d7','#242332','#f58cc8','#a66de4','#53bd79','#54a9e9','#e85a58'];
